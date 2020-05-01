@@ -1,12 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Windows.Forms;
 
 namespace AuroraPatch
 {
     static class Program
     {
+        public static string AuroraExecutableDirectory => Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
+
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
@@ -15,7 +20,48 @@ namespace AuroraPatch
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
+
+            var file = "Aurora.exe";
+            var assembly = Assembly.LoadFile(Path.Combine(AuroraExecutableDirectory, file));
+            var map = GetTacticalMap(assembly);
+
+            Application.Run(map);
+        }
+
+        private static Form GetTacticalMap(Assembly assembly)
+        {
+            // 67 buttons
+            // 67 checkboxes
+            
+            foreach (var type in assembly.GetTypes())
+            {
+                if (type.BaseType.Equals(typeof(Form)))
+                {
+                    var buttons = 0;
+                    var checkboxes = 0;
+
+                    foreach (var field in type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
+                    {
+                        if (field.FieldType.Equals(typeof(Button)))
+                        {
+                            buttons++;
+                        }
+                        else if (field.FieldType.Equals(typeof(CheckBox)))
+                        {
+                            checkboxes++;
+                        }
+                    }
+
+                    if (buttons >= 60 && buttons <= 80 && checkboxes >= 60 && checkboxes <= 80)
+                    {
+                        Debug.WriteLine("Map: " + type.Name);
+                        var map = (Form)Activator.CreateInstance(type);
+                        return map;
+                    }
+                }
+            }
+
+            throw new Exception("Tactical Map not found");
         }
     }
 }
