@@ -16,14 +16,20 @@ namespace AuroraPatch
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
-        static void Main()
+        static void Main(string[] args)
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
             var file = "Aurora.exe";
+            if (args.Length > 0)
+            {
+                file = args[0];
+            }
+
             var assembly = Assembly.LoadFile(Path.Combine(AuroraExecutableDirectory, file));
             var map = GetTacticalMap(assembly);
+            map.Shown += MapShown;
 
             Application.Run(map);
         }
@@ -56,12 +62,18 @@ namespace AuroraPatch
                     {
                         Debug.WriteLine("Map: " + type.Name);
                         var map = (Form)Activator.CreateInstance(type);
+
                         return map;
                     }
                 }
             }
 
             throw new Exception("Tactical Map not found");
+        }
+
+        private static void MapShown(object sender, EventArgs e)
+        {
+
         }
     }
 }
