@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace AuroraPatch
@@ -73,7 +74,19 @@ namespace AuroraPatch
 
         private static void MapShown(object sender, EventArgs e)
         {
-
+            foreach (var dll in Directory.EnumerateFiles(AuroraExecutableDirectory, "*.Patch.dll"))
+            {
+                var assembly = Assembly.LoadFile(dll);
+                foreach (var type in assembly.GetTypes())
+                {
+                    if (typeof(Patch).IsAssignableFrom(type))
+                    {
+                        var patch = (Patch)Activator.CreateInstance(type);
+                        var thread = new Thread(() => patch.Run((Form)sender)) { IsBackground = true };
+                        thread.Start();
+                    }
+                }
+            }
         }
     }
 }
