@@ -1,0 +1,20 @@
+﻿[
+  {
+    // Vanilla Aurora
+    "version": "1.9.3",
+    "checksum": "rTJo4i",
+    "formType": "jl"
+  },
+  {
+    // Cleaned Aurora (de4dot)
+    "version": "1.9.3",
+    "checksum": "8obaQg",
+    "formType": "TacticalMap"
+  },
+  {
+    // AuroraMod
+    "version": "1.9.3",
+    "checksum": "xVQcy1",
+    "formType": "TacticalMap"
+  }
+]
