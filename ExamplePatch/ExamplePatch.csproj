@@ -45,7 +45,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\AuroraPatch\AuroraPatch.csproj">
+    <ProjectReference Include="..\AuroraPatch\AuroraPatch.csproj" Private="false">
       <Project>{b1e5a9e8-57f7-45f0-920b-4ffa26ec0138}</Project>
       <Name>AuroraPatch</Name>
     </ProjectReference>
