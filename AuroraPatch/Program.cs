@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -27,8 +27,16 @@ namespace AuroraPatch
             {
                 file = args[0];
             }
-
-            var assembly = Assembly.LoadFile(Path.Combine(AuroraExecutableDirectory, file));
+            
+            var auroraExecutableFullPath = Path.Combine(AuroraExecutableDirectory, file);
+            if (!File.Exists(auroraExecutableFullPath))
+            {
+                MessageBox.Show($@"File ""{file}"" is missing or is not readable.");
+                Application.Exit();
+                return;
+            }
+            
+            var assembly = Assembly.LoadFile(auroraExecutableFullPath);
             var map = GetTacticalMap(assembly);
             map.Shown += MapShown;
 
