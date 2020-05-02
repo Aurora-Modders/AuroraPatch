@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -12,6 +13,7 @@ namespace AuroraPatch
     static class Program
     {
         public static string AuroraExecutableDirectory => Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
+        public static string AuroraChecksum { get; set; } = null;
 
         /// <summary>
         /// The main entry point for the application.
@@ -35,6 +37,8 @@ namespace AuroraPatch
                 Application.Exit();
                 return;
             }
+
+            AuroraChecksum = GetChecksum(File.ReadAllBytes(auroraExecutableFullPath));
             
             var assembly = Assembly.LoadFile(auroraExecutableFullPath);
             var map = GetTacticalMap(assembly);
@@ -94,6 +98,17 @@ namespace AuroraPatch
                         thread.Start();
                     }
                 }
+            }
+        }
+
+        private static string GetChecksum(byte[] bytes)
+        {
+            using (var sha = SHA256.Create())
+            {
+                var hash = sha.ComputeHash(bytes);
+                var str = Convert.ToBase64String(hash);
+
+                return str.Replace("/", "").Replace("+", "").Replace("=", "").Substring(0, 6);
             }
         }
     }
