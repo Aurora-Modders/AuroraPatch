@@ -32,6 +32,33 @@ namespace ExamplePatch
 
             harmony.Patch(method, new HarmonyMethod(((Action)PatchMethod).Method));
 
+            // Press the 5 day increment button 10 times in a row
+            Button button5d = null;
+
+            foreach (var field in map.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance))
+            {
+                if (field.FieldType == typeof(Button))
+                {
+                    var button = field.GetValue(map) as Button;
+                    if (button.Name == "cmdIncrement5D")
+                    {
+                        button5d = button;
+                        break;
+                    }
+                }
+            }
+
+            if (button5d == null)
+            {
+                throw new Exception("button5d not found");
+            }
+
+            for (int i = 0; i < 10; i++)
+            {
+                action = new Action(() => button5d.PerformClick());
+                InvokeOnUIThread(action);
+            }
+
             // Patch.Start is run on its own background thread, no need to return
             while (true)
             {
