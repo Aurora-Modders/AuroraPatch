@@ -59,6 +59,30 @@ namespace ExamplePatch
                 InvokeOnUIThread(action);
             }
 
+            // Add an event handler to pressing the 30d button
+            Button button30d = null;
+
+            foreach (var field in map.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance))
+            {
+                if (field.FieldType == typeof(Button))
+                {
+                    var button = field.GetValue(map) as Button;
+                    if (button.Name == "cmdIncrement30D")
+                    {
+                        button30d = button;
+                        break;
+                    }
+                }
+            }
+
+            if (button30d == null)
+            {
+                throw new Exception("button30d not found");
+            }
+
+            action = new Action(() => button30d.Click += Button30D);
+            InvokeOnUIThread(action);
+
             // Patch.Start is run on its own background thread, no need to return
             while (true)
             {
@@ -72,6 +96,12 @@ namespace ExamplePatch
         private static void PatchMethod()
         {
             MessageBox.Show("Harmony patched");
+        }
+
+        private static void Button30D(object sender, EventArgs e)
+        {
+            // ui event handlers are always run on the ui thread
+            MessageBox.Show("You've pressed the 30d increment button");
         }
     }
 
