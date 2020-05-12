@@ -40,7 +40,7 @@ namespace AuroraPatch
 
             AuroraChecksum = GetChecksum(File.ReadAllBytes(auroraExecutableFullPath));
             
-            var assembly = Assembly.LoadFile(auroraExecutableFullPath);
+            var assembly = Assembly.UnsafeLoadFrom(auroraExecutableFullPath);
             var map = GetTacticalMap(assembly);
             map.Shown += MapShown;
 
