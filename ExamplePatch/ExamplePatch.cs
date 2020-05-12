@@ -25,12 +25,10 @@ namespace ExamplePatch
 
             // Harmony support
             var harmony = new Harmony("some.id");
-            var method = (MethodBase)map.GetType().Assembly.GetTypes()
-                .Single(type => type.Name == "Economics")
-                .GetMethods(BindingFlags.NonPublic | BindingFlags.Instance)
-                .Single(m => m.Name == "InitializeComponent");
-
-            harmony.Patch(method, new HarmonyMethod(((Action)PatchMethod).Method));
+            var type = map.GetType().Assembly.GetTypes().Single(t => t.Name == "Economics");
+            var original = AccessTools.Method(type, "InitializeComponent");
+            var prefix = SymbolExtensions.GetMethodInfo(() => PatchMethod());
+            harmony.Patch(original, new HarmonyMethod(prefix));
 
             // Press the 5 day increment button 10 times in a row
             Button button5d = null;
