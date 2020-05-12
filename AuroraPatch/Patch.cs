@@ -22,5 +22,10 @@ namespace AuroraPatch
         {
             TacticalMap.Invoke(action);
         }
+
+        protected object InvokeOnUIThread(Delegate method, params object[] args)
+        {
+            return TacticalMap.Invoke(method, args);
+        }
     }
 }
