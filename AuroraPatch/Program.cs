@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 namespace AuroraPatch
 {
-    static class Program
+    public static class Program
     {
         public static string AuroraExecutableDirectory => Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
         public static string AuroraChecksum { get; set; } = null;

@@ -19,6 +19,12 @@ namespace ExamplePatch
             // save a reference to the tactical map
             TacticalMap = map;
 
+            // get the checksum of the exe you're patching
+            var checksum = Program.AuroraChecksum;
+
+            // get its dirrectory
+            var dir = Program.AuroraExecutableDirectory;
+
             // invoke arbitrary code on Aurora's UI thread
             var action = new Action(() => MessageBox.Show("Example patch loaded!"));
             InvokeOnUIThread(action);
