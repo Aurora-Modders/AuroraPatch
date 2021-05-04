@@ -19,7 +19,7 @@ namespace AuroraPatch
 
         private void ButtonStart_Click(object sender, EventArgs e)
         {
-            var patches = Directory.EnumerateFiles(Path.Combine(Program.AuroraExecutableDirectory, "Patches"), "*.dll").ToList();
+            var patches = Directory.EnumerateFiles(Path.Combine(Path.GetDirectoryName(Program.AuroraExecutable), "Patches"), "*.dll").ToList();
             Program.StartAurora(patches);
         }
     }

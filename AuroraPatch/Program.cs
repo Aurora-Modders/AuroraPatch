@@ -12,10 +12,8 @@ namespace AuroraPatch
     public static class Program
     {
         public static string AuroraExecutable { get; private set; } = null;
-        public static string AuroraExecutableDirectory => Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
         public static string AuroraChecksum { get; set; } = null;
         public static Logger Logger = new Logger();
-        internal static Form TacticalMap { get; set; } = null;
 
         /// <summary>
         /// The main entry point for the application.
@@ -27,17 +25,16 @@ namespace AuroraPatch
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            var file = "Aurora.exe";
+            AuroraExecutable = Path.Combine(Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName), "Aurora.exe");
             if (args.Length > 0)
             {
                 Logger.LogInfo("User provided Aurora.exe path: " + args[0]);
-                file = args[0];
+                AuroraExecutable = args[0];
             }
             
-            AuroraExecutable = Path.Combine(AuroraExecutableDirectory, file);
             if (!File.Exists(AuroraExecutable))
             {
-                Logger.LogCritical($@"File ""{file}"" is missing or is not readable.");
+                Logger.LogCritical($"File {AuroraExecutable} is missing or is not readable.");
                 Application.Exit();
 
                 return;
@@ -54,7 +51,7 @@ namespace AuroraPatch
             var assembly = Assembly.LoadFile(AuroraExecutable);
 
             Logger.LogInfo("Retrieving TacticalMap");
-            TacticalMap = GetTacticalMap(assembly);
+            var map = GetTacticalMap(assembly);
 
             Logger.LogInfo("Loading patches");
             foreach (var file in files)
@@ -65,13 +62,13 @@ namespace AuroraPatch
                     {
                         Logger.LogDebug("Applying patch " + type.Name);
                         var patch = (Patch)Activator.CreateInstance(type);
-                        patch.Run(TacticalMap);
+                        patch.Run(map);
                     }
                 }
             }
 
             Logger.LogInfo("Starting Aurora");
-            TacticalMap.Show();
+            map.Show();
         }
 
         /// <summary>
@@ -117,32 +114,6 @@ namespace AuroraPatch
             // If we expose more forms/functionality in the future, may want to make this an error instead
             // and allow execution to continue as some patches may still work if not interfacing with the map.
             throw new Exception("TacticalMap not found");
-        }
-
-        /// <summary>
-        /// Method called when the TacticalMap Form is shown.
-        /// We use this opportunity to load up the various 3rd party patches.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private static void MapShown(object sender, EventArgs e)
-        {
-            Logger.LogDebug("MapShown callback method - searching for 3rd party patches ending in *.Patch.dll in " + AuroraExecutableDirectory);
-            var dir = Path.Combine(AuroraExecutableDirectory, "Patches");
-            foreach (var dll in Directory.EnumerateFiles(dir, "*.dll"))
-            {
-                var assembly = Assembly.LoadFile(dll);
-                foreach (var type in assembly.GetTypes())
-                {
-                    if (typeof(Patch).IsAssignableFrom(type))
-                    {
-                        Logger.LogDebug("Found " + type.Name + " - creating instance and starting in background thread");
-                        var patch = (Patch)Activator.CreateInstance(type);
-                        var thread = new Thread(() => patch.Run((Form)sender)) { IsBackground = true };
-                        thread.Start();
-                    }
-                }
-            }
         }
 
         /// <summary>

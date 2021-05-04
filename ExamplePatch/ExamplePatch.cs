@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using HarmonyLib;
 
 using AuroraPatch;
+using System.IO;
 
 namespace ExamplePatch
 {
@@ -21,7 +22,7 @@ namespace ExamplePatch
             Program.Logger.LogInfo($"Checksum {checksum}");
 
             // get its directory
-            var dir = Program.AuroraExecutableDirectory;
+            var dir = Path.GetDirectoryName(Program.AuroraExecutable);
 
             // invoke arbitrary code on Aurora's UI thread
             var action = new Action(() => MessageBox.Show("Example patch loaded!"));
