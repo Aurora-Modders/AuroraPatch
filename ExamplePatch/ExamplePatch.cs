@@ -15,7 +15,7 @@ namespace ExamplePatch
 
         protected override void Start(Form map)
         {
-            Program.logger.LogInfo("Loading ExamplePatch...");
+            Program.Logger.LogInfo("Loading ExamplePatch...");
 
             // save a reference to the tactical map
             TacticalMap = map;
@@ -88,7 +88,7 @@ namespace ExamplePatch
             action = new Action(() => button30d.Click += Button30D);
             InvokeOnUIThread(action);
 
-            Program.logger.LogInfo("ExamplePatch loaded successfully");
+            Program.Logger.LogInfo("ExamplePatch loaded successfully");
 
             // Patch.Start is run on its own background thread, no need to return
             while (true)

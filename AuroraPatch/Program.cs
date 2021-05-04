@@ -12,7 +12,7 @@ namespace AuroraPatch
     {
         public static string AuroraExecutableDirectory => Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
         public static string AuroraChecksum { get; set; } = null;
-        public static Logger logger = new Logger();
+        public static Logger Logger = new Logger();
 
         /// <summary>
         /// The main entry point for the application.
@@ -27,27 +27,27 @@ namespace AuroraPatch
             var file = "Aurora.exe";
             if (args.Length > 0)
             {
-                logger.LogInfo("User provided Aurora.exe path: " + args[0]);
+                Logger.LogInfo("User provided Aurora.exe path: " + args[0]);
                 file = args[0];
             }
             
             var auroraExecutableFullPath = Path.Combine(AuroraExecutableDirectory, file);
             if (!File.Exists(auroraExecutableFullPath))
             {
-                logger.LogCritical($@"File ""{file}"" is missing or is not readable.");
+                Logger.LogCritical($@"File ""{file}"" is missing or is not readable.");
                 Application.Exit();
                 return;
             }
 
             AuroraChecksum = GetChecksum(File.ReadAllBytes(auroraExecutableFullPath));
-            logger.LogInfo("Loading assembly " + auroraExecutableFullPath + " with checksum " + AuroraChecksum);
+            Logger.LogInfo("Loading assembly " + auroraExecutableFullPath + " with checksum " + AuroraChecksum);
             var assembly = Assembly.LoadFile(auroraExecutableFullPath);
 
-            logger.LogInfo("Retrieving TacticalMap");
+            Logger.LogInfo("Retrieving TacticalMap");
             var map = GetTacticalMap(assembly);
             map.Shown += MapShown;
 
-            logger.LogInfo("Loading patches and starting Aurora");
+            Logger.LogInfo("Loading patches and starting Aurora");
             Application.Run(map);
         }
 
@@ -82,7 +82,7 @@ namespace AuroraPatch
 
                     if (buttons >= 60 && buttons <= 80 && checkboxes >= 60 && checkboxes <= 80)
                     {
-                        logger.LogDebug("TacticalMap found: " + type.Name);
+                        Logger.LogDebug("TacticalMap found: " + type.Name);
                         var map = (Form)Activator.CreateInstance(type);
 
                         return map;
@@ -90,7 +90,7 @@ namespace AuroraPatch
                 }
             }
 
-            logger.LogCritical("TacticalMap not found");
+            Logger.LogCritical("TacticalMap not found");
             // If we expose more forms/functionality in the future, may want to make this an error instead
             // and allow execution to continue as some patches may still work if not interfacing with the map.
             throw new Exception("TacticalMap not found");
@@ -104,15 +104,16 @@ namespace AuroraPatch
         /// <param name="e"></param>
         private static void MapShown(object sender, EventArgs e)
         {
-            logger.LogDebug("MapShown callback method - searching for 3rd party patches ending in *.Patch.dll in " + AuroraExecutableDirectory);
-            foreach (var dll in Directory.EnumerateFiles(AuroraExecutableDirectory, "*.Patch.dll"))
+            Logger.LogDebug("MapShown callback method - searching for 3rd party patches ending in *.Patch.dll in " + AuroraExecutableDirectory);
+            var dir = Path.Combine(AuroraExecutableDirectory, "Patches");
+            foreach (var dll in Directory.EnumerateFiles(dir, "*.dll"))
             {
                 var assembly = Assembly.LoadFile(dll);
                 foreach (var type in assembly.GetTypes())
                 {
                     if (typeof(Patch).IsAssignableFrom(type))
                     {
-                        logger.LogDebug("Found " + type.Name + " - creating instance and starting in background thread");
+                        Logger.LogDebug("Found " + type.Name + " - creating instance and starting in background thread");
                         var patch = (Patch)Activator.CreateInstance(type);
                         var thread = new Thread(() => patch.Run((Form)sender)) { IsBackground = true };
                         thread.Start();
@@ -128,14 +129,14 @@ namespace AuroraPatch
         /// <returns></returns>
         private static string GetChecksum(byte[] bytes)
         {
-            logger.LogDebug("Calculating checksum");
+            Logger.LogDebug("Calculating checksum");
             using (var sha = SHA256.Create())
             {
                 var hash = sha.ComputeHash(bytes);
                 var str = Convert.ToBase64String(hash);
 
                 string checksum = str.Replace("/", "").Replace("+", "").Replace("=", "").Substring(0, 6);
-                logger.LogDebug("Checksum: " + checksum);
+                Logger.LogDebug("Checksum: " + checksum);
                 return checksum;
             }
         }
