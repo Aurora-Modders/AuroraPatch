@@ -1,12 +1,11 @@
-﻿using AuroraPatch;
-using HarmonyLib;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading;
 using System.Windows.Forms;
+using HarmonyLib;
+
+using AuroraPatch;
 
 namespace ExamplePatch
 {
@@ -16,6 +15,8 @@ namespace ExamplePatch
 
         protected override void Start(Form map)
         {
+            Program.logger.LogInfo("Loading ExamplePatch...");
+
             // save a reference to the tactical map
             TacticalMap = map;
 
@@ -86,6 +87,8 @@ namespace ExamplePatch
 
             action = new Action(() => button30d.Click += Button30D);
             InvokeOnUIThread(action);
+
+            Program.logger.LogInfo("ExamplePatch loaded successfully");
 
             // Patch.Start is run on its own background thread, no need to return
             while (true)
