@@ -7,35 +7,38 @@ using HarmonyLib;
 
 using AuroraPatch;
 using System.IO;
+using System.Drawing;
 
 namespace ExamplePatch
 {
     public class ExamplePatch : AuroraPatch.Patch
     {
-        protected override void Start(Form map)
+        protected override void Load(Assembly aurora)
         {
             Program.Logger.LogInfo("Loading ExamplePatch...");
 
-            // get the checksum of the exe you're patching
+            // get the exe and its checksum
+            var exe = Program.AuroraExecutable;
             var checksum = Program.AuroraChecksum;
-
-            Program.Logger.LogInfo($"Checksum {checksum}");
-
-            // get its directory
-            var dir = Path.GetDirectoryName(Program.AuroraExecutable);
-
-            // invoke arbitrary code on Aurora's UI thread
-            var action = new Action(() => MessageBox.Show("Example patch loaded!"));
-            InvokeOnUIThread(action);
 
             return;
 
             // Harmony support
             var harmony = new Harmony("some.id");
-            var type = map.GetType().Assembly.GetTypes().Single(t => t.Name == "Economics");
+            var type = aurora.GetTypes().Single(t => t.Name == "Economics");
             var original = AccessTools.Method(type, "InitializeComponent");
             var prefix = SymbolExtensions.GetMethodInfo(() => PatchMethod());
             harmony.Patch(original, new HarmonyMethod(prefix));
+        }
+
+        protected override void Start(Form map)
+        {
+            // set background color to black
+            map.BackColor = Color.Black;
+
+            // invoke arbitrary code on Aurora's UI thread
+            var action = new Action(() => MessageBox.Show("Example patch loaded!"));
+            InvokeOnUIThread(action);
         }
 
         private static void PatchMethod()

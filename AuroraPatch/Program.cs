@@ -12,8 +12,12 @@ namespace AuroraPatch
     public static class Program
     {
         public static string AuroraExecutable { get; private set; } = null;
-        public static string AuroraChecksum { get; set; } = null;
+        public static string AuroraChecksum { get; private set; } = null;
         public static Logger Logger = new Logger();
+
+        private static Form TacticalMap { get; set; } = null;
+        private static readonly List<Patch> Patches = new List<Patch>();
+        private static bool Started { get; set; } = false;
 
         /// <summary>
         /// The main entry point for the application.
@@ -47,11 +51,15 @@ namespace AuroraPatch
 
         internal static void StartAurora(List<string> files)
         {
+            TacticalMap = null;
+            Patches.Clear();
+            Started = false;
+
             Logger.LogInfo("Loading assembly " + AuroraExecutable + " with checksum " + AuroraChecksum);
             var assembly = Assembly.LoadFile(AuroraExecutable);
 
             Logger.LogInfo("Retrieving TacticalMap");
-            var map = GetTacticalMap(assembly);
+            TacticalMap = GetTacticalMap(assembly);
 
             Logger.LogInfo("Loading patches");
             foreach (var file in files)
@@ -60,15 +68,46 @@ namespace AuroraPatch
                 {
                     if (typeof(Patch).IsAssignableFrom(type))
                     {
-                        Logger.LogDebug("Applying patch " + type.Name);
+                        Logger.LogInfo("Applying patch " + type.Name);
                         var patch = (Patch)Activator.CreateInstance(type);
-                        patch.Run(map);
+                        Patches.Add(patch);
+                        patch.LoadInternal(TacticalMap.GetType().Assembly);
                     }
                 }
             }
 
             Logger.LogInfo("Starting Aurora");
-            map.Show();
+            TacticalMap.Shown += MapShown;
+            TacticalMap.Show();
+        }
+
+        internal static object InvokeOnUIThread(Delegate method, params object[] args)
+        {
+            if (Started)
+            {
+                return TacticalMap.Invoke(method, args);
+            }
+            else
+            {
+                Logger.LogError("Can not invoke on UI thread before the game is started");
+
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Method called when the TacticalMap Form is shown.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private static void MapShown(object sender, EventArgs e)
+        {
+            Started = true;
+            Logger.LogInfo("Starting patches");
+            foreach (var patch in Patches)
+            {
+                patch.StartInternal(TacticalMap);
+            }
         }
 
         /// <summary>
@@ -102,7 +141,7 @@ namespace AuroraPatch
 
                     if (buttons >= 60 && buttons <= 80 && checkboxes >= 60 && checkboxes <= 80)
                     {
-                        Logger.LogDebug("TacticalMap found: " + type.Name);
+                        Logger.LogInfo("TacticalMap found: " + type.Name);
                         var map = (Form)Activator.CreateInstance(type);
 
                         return map;

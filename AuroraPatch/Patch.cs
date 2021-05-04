@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
 
@@ -8,24 +9,34 @@ namespace AuroraPatch
 {
     public abstract class Patch
     {
-        private Form TacticalMap { get; set; } = null;
-
-        internal void Run(Form map)
+        internal void LoadInternal(Assembly aurora)
         {
-            TacticalMap = map;
-            Start(TacticalMap);
+            Load(aurora);
         }
 
+        internal void StartInternal(Form map)
+        {
+            Start(map);
+        }
+
+        /// <summary>
+        /// Called before the game is started. Use this to patch methods etc.
+        /// </summary>
+        /// <param name="aurora"></param>
+        protected abstract void Load(Assembly aurora);
+
+        /// <summary>
+        /// Called after game start. You can now invoke code on Aurora's UI thread.
+        /// </summary>
+        /// /// <param name="map"></param>
         protected abstract void Start(Form map);
 
-        protected void InvokeOnUIThread(Action action)
-        {
-            TacticalMap.Invoke(action);
-        }
-
+        /// <summary>
+        /// Run code on Aurora's UI thread. Only available after game start.
+        /// </summary>
         protected object InvokeOnUIThread(Delegate method, params object[] args)
         {
-            return TacticalMap.Invoke(method, args);
+            return Program.InvokeOnUIThread(method, args);
         }
     }
 }
