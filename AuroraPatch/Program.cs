@@ -5,14 +5,17 @@ using System.Reflection;
 using System.Diagnostics;
 using System.Windows.Forms;
 using System.Security.Cryptography;
+using System.Collections.Generic;
 
 namespace AuroraPatch
 {
     public static class Program
     {
+        public static string AuroraExecutable { get; private set; } = null;
         public static string AuroraExecutableDirectory => Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
         public static string AuroraChecksum { get; set; } = null;
         public static Logger Logger = new Logger();
+        internal static Form TacticalMap { get; set; } = null;
 
         /// <summary>
         /// The main entry point for the application.
@@ -31,24 +34,44 @@ namespace AuroraPatch
                 file = args[0];
             }
             
-            var auroraExecutableFullPath = Path.Combine(AuroraExecutableDirectory, file);
-            if (!File.Exists(auroraExecutableFullPath))
+            AuroraExecutable = Path.Combine(AuroraExecutableDirectory, file);
+            if (!File.Exists(AuroraExecutable))
             {
                 Logger.LogCritical($@"File ""{file}"" is missing or is not readable.");
                 Application.Exit();
+
                 return;
             }
 
-            AuroraChecksum = GetChecksum(File.ReadAllBytes(auroraExecutableFullPath));
-            Logger.LogInfo("Loading assembly " + auroraExecutableFullPath + " with checksum " + AuroraChecksum);
-            var assembly = Assembly.LoadFile(auroraExecutableFullPath);
+            AuroraChecksum = GetChecksum(File.ReadAllBytes(AuroraExecutable));
+            
+            Application.Run(new Form1());
+        }
+
+        internal static void StartAurora(List<string> files)
+        {
+            Logger.LogInfo("Loading assembly " + AuroraExecutable + " with checksum " + AuroraChecksum);
+            var assembly = Assembly.LoadFile(AuroraExecutable);
 
             Logger.LogInfo("Retrieving TacticalMap");
-            var map = GetTacticalMap(assembly);
-            map.Shown += MapShown;
+            TacticalMap = GetTacticalMap(assembly);
 
-            Logger.LogInfo("Loading patches and starting Aurora");
-            Application.Run(map);
+            Logger.LogInfo("Loading patches");
+            foreach (var file in files)
+            {
+                foreach (var type in Assembly.LoadFile(file).GetTypes())
+                {
+                    if (typeof(Patch).IsAssignableFrom(type))
+                    {
+                        Logger.LogDebug("Applying patch " + type.Name);
+                        var patch = (Patch)Activator.CreateInstance(type);
+                        patch.Run(TacticalMap);
+                    }
+                }
+            }
+
+            Logger.LogInfo("Starting Aurora");
+            TacticalMap.Show();
         }
 
         /// <summary>
