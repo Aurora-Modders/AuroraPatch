@@ -1,0 +1,140 @@
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Security.Cryptography;
+using System.Text;
+using System.Windows.Forms;
+
+namespace AuroraPatch
+{
+    internal class Loader
+    {
+        internal readonly string AuroraExecutable;
+        internal readonly string AuroraChecksum;
+        internal readonly List<Patch> LoadedPatches = new List<Patch>();
+
+        private Form TacticalMap { get; set; } = null;
+        private bool Started { get; set; } = false;
+
+        internal Loader(string exe, string checksum)
+        {
+            AuroraExecutable = exe;
+            AuroraChecksum = checksum;
+        }
+
+        internal object InvokeOnUIThread(Delegate method, params object[] args)
+        {
+            if (Started)
+            {
+                return TacticalMap.Invoke(method, args);
+            }
+            else
+            {
+                Program.Logger.LogError("Can not invoke on UI thread before the game is started");
+
+                return null;
+            }
+        }
+
+        internal IEnumerable<Patch> FindPatches()
+        {
+            foreach (var dll in Directory.EnumerateFiles(Path.Combine(Path.GetDirectoryName(AuroraExecutable), "Patches"), "*.dll"))
+            {
+                foreach (var type in Assembly.LoadFile(dll).GetTypes())
+                {
+                    if (typeof(Patch).IsAssignableFrom(type))
+                    {
+                        yield return (Patch)Activator.CreateInstance(type);
+                    }
+                }
+            }
+        }
+
+        internal void StartAurora(List<Patch> patches)
+        {
+            TacticalMap = null;
+            LoadedPatches.Clear();
+            Started = false;
+
+            Program.Logger.LogInfo("Loading assembly " + AuroraExecutable + " with checksum " + AuroraChecksum);
+            var assembly = Assembly.LoadFile(AuroraExecutable);
+
+            Program.Logger.LogInfo("Loading patches");
+            foreach (var patch in patches)
+            {
+                Program.Logger.LogInfo("Applying patch " + patch.Name);
+
+                patch.Loader = this;
+                patch.LoadInternal(assembly);
+                LoadedPatches.Add(patch);
+            }
+
+            Program.Logger.LogInfo("Starting Aurora");
+            TacticalMap = GetTacticalMap(assembly);
+            TacticalMap.Shown += MapShown;
+            TacticalMap.Show();
+        }
+
+        /// <summary>
+        /// Method called when the TacticalMap Form is shown.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void MapShown(object sender, EventArgs e)
+        {
+            Started = true;
+            Program.Logger.LogInfo("Starting patches");
+            foreach (var patch in LoadedPatches)
+            {
+                patch.StartInternal(TacticalMap);
+            }
+        }
+
+        /// <summary>
+        /// Given the Aurora.exe assembly, find and return the TacticalMap Form object.
+        /// This can be a bit tricky due to the obfuscation. We're going in blind and counting buttons/checkboxes.
+        /// As of May 3rd 2021 (Aurora 1.13), the TacticalMap had 66 buttons and 68 checkboxes so that's our signature.
+        /// We got a bit of wiggle room as we're looking for a Form object with anywhere between 60 and 80 of each.
+        /// </summary>
+        /// <param name="assembly"></param>
+        /// <returns>TacticalMap Form object</returns>
+        private Form GetTacticalMap(Assembly assembly)
+        {
+            foreach (var type in assembly.GetTypes())
+            {
+                if (type.BaseType.Equals(typeof(Form)))
+                {
+                    var buttons = 0;
+                    var checkboxes = 0;
+
+                    foreach (var field in type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
+                    {
+                        if (field.FieldType.Equals(typeof(Button)))
+                        {
+                            buttons++;
+                        }
+                        else if (field.FieldType.Equals(typeof(CheckBox)))
+                        {
+                            checkboxes++;
+                        }
+                    }
+
+                    if (buttons >= 60 && buttons <= 80 && checkboxes >= 60 && checkboxes <= 80)
+                    {
+                        Program.Logger.LogInfo("TacticalMap found: " + type.Name);
+                        var map = (Form)Activator.CreateInstance(type);
+
+                        return map;
+                    }
+                }
+            }
+
+            Program.Logger.LogCritical("TacticalMap not found");
+            // If we expose more forms/functionality in the future, may want to make this an error instead
+            // and allow execution to continue as some patches may still work if not interfacing with the map.
+            throw new Exception("TacticalMap not found");
+        }
+    }
+}
