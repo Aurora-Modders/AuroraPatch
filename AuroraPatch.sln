@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuroraPatch", "AuroraPatch\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExamplePatch", "ExamplePatch\ExamplePatch.csproj", "{678B78E2-A32A-4490-8D2E-18737A8532CF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lib", "Lib\Lib.csproj", "{ACCE82BB-B894-4158-8167-C88A3AD5FCBE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{678B78E2-A32A-4490-8D2E-18737A8532CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{678B78E2-A32A-4490-8D2E-18737A8532CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{678B78E2-A32A-4490-8D2E-18737A8532CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ACCE82BB-B894-4158-8167-C88A3AD5FCBE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ACCE82BB-B894-4158-8167-C88A3AD5FCBE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ACCE82BB-B894-4158-8167-C88A3AD5FCBE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ACCE82BB-B894-4158-8167-C88A3AD5FCBE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

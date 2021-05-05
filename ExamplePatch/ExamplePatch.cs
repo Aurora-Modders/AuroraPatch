@@ -3,17 +3,19 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Windows.Forms;
-using HarmonyLib;
 
 using AuroraPatch;
+using Lib;
 using System.IO;
 using System.Drawing;
 using System.Collections.Generic;
 
 namespace ExamplePatch
 {
-    public class ExamplePatch : AuroraPatch.Patch
+    public class ExamplePatch : Patch
     {
+        public override IEnumerable<string> Dependencies { get { return new[] { "Lib" }; } }
+
         protected override void Load(Assembly aurora)
         {
             Logger.LogInfo("Loading ExamplePatch...");
@@ -22,14 +24,10 @@ namespace ExamplePatch
             var exe = AuroraExecutable;
             var checksum = AuroraChecksum;
 
-            return;
-
-            // Harmony support
-            var harmony = new Harmony("some.id");
-            var type = aurora.GetTypes().Single(t => t.Name == "Economics");
-            var original = AccessTools.Method(type, "InitializeComponent");
-            var prefix = SymbolExtensions.GetMethodInfo(() => PatchMethod());
-            harmony.Patch(original, new HarmonyMethod(prefix));
+            // dependency
+            var lib = (Lib.Lib)LoadedPatches.Single(p => p.Name == "Lib");
+            var eco = lib.TypeManager.GetFormType(AuroraFormType.Economics);
+            Logger.LogInfo($"Economics type name {eco.Name}");
         }
 
         protected override void Start(Form map)
@@ -40,11 +38,6 @@ namespace ExamplePatch
             // invoke arbitrary code on Aurora's UI thread
             var action = new Action(() => MessageBox.Show("Example patch loaded!"));
             InvokeOnUIThread(action);
-        }
-
-        private static void PatchMethod()
-        {
-            MessageBox.Show("Harmony patched");
         }
     }
 
