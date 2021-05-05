@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Linq;
+using System.Drawing;
 using System.Reflection;
-using System.Threading;
 using System.Windows.Forms;
+using System.Collections.Generic;
 
 using HarmonyLib;
 using AuroraPatch;
 using Lib;
-using System.IO;
-using System.Drawing;
-using System.Collections.Generic;
 
 namespace ExamplePatch
 {
