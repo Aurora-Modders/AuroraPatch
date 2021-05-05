@@ -26,7 +26,6 @@ namespace ExamplePatch
             // dependency
             var lib = (Lib.Lib)LoadedPatches.Single(p => p.Name == "Lib");
             var map = lib.TypeManager.GetFormType(AuroraFormType.TacticalMap);
-            Logger.LogInfo($"Economics type name {map.Name}");
 
             // Harmony
             var ctor = (MethodBase)map.GetMember(".ctor", AccessTools.all)[0];
