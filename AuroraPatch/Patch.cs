@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HarmonyLib;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -20,7 +21,7 @@ namespace AuroraPatch
         
         internal void LoadInternal(Assembly aurora)
         {
-            Load(aurora);
+            Load(aurora, new Harmony(Name));
         }
 
         internal void StartInternal(Form map)
@@ -32,7 +33,7 @@ namespace AuroraPatch
         /// Called before the game is started. Use this to patch methods etc.
         /// </summary>
         /// <param name="aurora"></param>
-        protected abstract void Load(Assembly aurora);
+        protected abstract void Load(Assembly aurora, Harmony harmony);
 
         /// <summary>
         /// Called after game start. You can now invoke code on Aurora's UI thread.

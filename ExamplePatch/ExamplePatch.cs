@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Threading;
 using System.Windows.Forms;
 
+using HarmonyLib;
 using AuroraPatch;
 using Lib;
 using System.IO;
@@ -12,11 +13,16 @@ using System.Collections.Generic;
 
 namespace ExamplePatch
 {
-    public class ExamplePatch : Patch
+    public class ExamplePatch : AuroraPatch.Patch
     {
         public override IEnumerable<string> Dependencies { get { return new[] { "Lib" }; } }
 
-        protected override void Load(Assembly aurora)
+        public static void PatchMethod()
+        {
+            MessageBox.Show("Harmony patched!");
+        }
+
+        protected override void Load(Assembly aurora, Harmony harmony)
         {
             Logger.LogInfo("Loading ExamplePatch...");
 
@@ -28,6 +34,10 @@ namespace ExamplePatch
             var lib = (Lib.Lib)LoadedPatches.Single(p => p.Name == "Lib");
             var eco = lib.TypeManager.GetFormType(AuroraFormType.Economics);
             Logger.LogInfo($"Economics type name {eco.Name}");
+
+            var ctor = (MethodBase)eco.GetMember(".ctor", AccessTools.all)[0];
+            var method = new HarmonyMethod(GetType().GetMethod("PatchMethod", AccessTools.all));
+            harmony.Patch(ctor, null, method);
         }
 
         protected override void Start(Form map)
