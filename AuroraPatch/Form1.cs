@@ -23,6 +23,7 @@ namespace AuroraPatch
         private void ButtonStart_Click(object sender, EventArgs e)
         {
             var patches = Loader.FindPatches().ToList();
+            Loader.SortPatches(patches);
             Loader.StartAurora(patches);
         }
     }

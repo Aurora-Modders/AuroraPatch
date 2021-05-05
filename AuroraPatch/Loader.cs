@@ -38,18 +38,43 @@ namespace AuroraPatch
             }
         }
 
-        internal IEnumerable<Patch> FindPatches()
+        internal List<Patch> FindPatches()
         {
+            var patches = new List<Patch>();
+
             foreach (var dll in Directory.EnumerateFiles(Path.Combine(Path.GetDirectoryName(AuroraExecutable), "Patches"), "*.dll"))
             {
-                foreach (var type in Assembly.LoadFile(dll).GetTypes())
+                foreach (var type in Assembly.LoadFrom(dll).GetTypes())
                 {
                     if (typeof(Patch).IsAssignableFrom(type))
                     {
-                        yield return (Patch)Activator.CreateInstance(type);
+                        patches.Add((Patch)Activator.CreateInstance(type));
                     }
                 }
             }
+
+            return patches;
+        }
+
+        internal void SortPatches(List<Patch> patches)
+        {
+            // TODO check for circular dependencies
+
+            patches.Sort((a, b) =>
+            {
+                if (a.Dependencies.Contains(b.Name))
+                {
+                    return 1;
+                }
+                else if (b.Dependencies.Contains(a.Name))
+                {
+                    return -1;
+                }
+                else
+                {
+                    return 0;
+                }
+            });
         }
 
         internal void StartAurora(List<Patch> patches)
