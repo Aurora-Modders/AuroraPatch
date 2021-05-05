@@ -8,11 +8,15 @@ using System.Security.Cryptography;
 
 namespace AuroraPatch
 {
+    /// <summary>
+    /// Our patcher program.
+    /// </summary>
     public static class Program
     {
         public static string AuroraExecutableDirectory => Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
         public static string AuroraChecksum { get; set; } = null;
-        public static Logger logger = new Logger();
+        public static TypeManager TypeManager;
+        public static Logger logger;
 
         /// <summary>
         /// The main entry point for the application.
@@ -21,6 +25,9 @@ namespace AuroraPatch
         [STAThread]
         static void Main(string[] args)
         {
+            // TODO: Parse CLI flags for log settings.
+            logger = new Logger(LogLevel.Info, "AuroraPatch", "AuroraPatch.log");
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
@@ -41,59 +48,21 @@ namespace AuroraPatch
 
             AuroraChecksum = GetChecksum(File.ReadAllBytes(auroraExecutableFullPath));
             logger.LogInfo("Loading assembly " + auroraExecutableFullPath + " with checksum " + AuroraChecksum);
-            var assembly = Assembly.LoadFile(auroraExecutableFullPath);
+            var auroraAssembly = Assembly.LoadFile(auroraExecutableFullPath);
 
-            logger.LogInfo("Retrieving TacticalMap");
-            var map = GetTacticalMap(assembly);
-            map.Shown += MapShown;
+            logger.LogInfo("Finding and storing Aurora Form types");
+            TypeManager = new TypeManager(auroraAssembly, logger);
 
-            logger.LogInfo("Loading patches and starting Aurora");
-            Application.Run(map);
-        }
-
-        /// <summary>
-        /// Given the Aurora.exe assembly, find and return the TacticalMap Form object.
-        /// This can be a bit tricky due to the obfuscation. We're going in blind and counting buttons/checkboxes.
-        /// As of May 3rd 2021 (Aurora 1.13), the TacticalMap had 66 buttons and 68 checkboxes so that's our signature.
-        /// We got a bit of wiggle room as we're looking for a Form object with anywhere between 60 and 80 of each.
-        /// </summary>
-        /// <param name="assembly"></param>
-        /// <returns>TacticalMap Form object</returns>
-        private static Form GetTacticalMap(Assembly assembly)
-        {
-            foreach (var type in assembly.GetTypes())
+            var map = TypeManager.GetFormInstance(AuroraFormType.TacticalMap);
+            if (map == null)
             {
-                if (type.BaseType.Equals(typeof(Form)))
-                {
-                    var buttons = 0;
-                    var checkboxes = 0;
-
-                    foreach (var field in type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
-                    {
-                        if (field.FieldType.Equals(typeof(Button)))
-                        {
-                            buttons++;
-                        }
-                        else if (field.FieldType.Equals(typeof(CheckBox)))
-                        {
-                            checkboxes++;
-                        }
-                    }
-
-                    if (buttons >= 60 && buttons <= 80 && checkboxes >= 60 && checkboxes <= 80)
-                    {
-                        logger.LogDebug("TacticalMap found: " + type.Name);
-                        var map = (Form)Activator.CreateInstance(type);
-
-                        return map;
-                    }
-                }
+                logger.LogCritical("Failed to create TacticalMap Form instance - can not patch Aurora executable");
+                throw new Exception("TacticalMap not found");
             }
 
-            logger.LogCritical("TacticalMap not found");
-            // If we expose more forms/functionality in the future, may want to make this an error instead
-            // and allow execution to continue as some patches may still work if not interfacing with the map.
-            throw new Exception("TacticalMap not found");
+            map.Shown += MapShown;
+            logger.LogInfo("Loading patches and starting Aurora");
+            Application.Run(map);
         }
 
         /// <summary>
@@ -114,7 +83,7 @@ namespace AuroraPatch
                     {
                         logger.LogDebug("Found " + type.Name + " - creating instance and starting in background thread");
                         var patch = (Patch)Activator.CreateInstance(type);
-                        var thread = new Thread(() => patch.Run((Form)sender)) { IsBackground = true };
+                        var thread = new Thread(() => patch.Run(TypeManager)) { IsBackground = true };
                         thread.Start();
                     }
                 }
