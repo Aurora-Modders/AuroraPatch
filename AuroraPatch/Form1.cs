@@ -12,15 +12,18 @@ namespace AuroraPatch
 {
     public partial class Form1 : Form
     {
-        public Form1()
+        private readonly Loader Loader;
+
+        internal Form1(Loader loader) : base()
         {
+            Loader = loader;
             InitializeComponent();
         }
 
         private void ButtonStart_Click(object sender, EventArgs e)
         {
-            var patches = Directory.EnumerateFiles(Path.Combine(Path.GetDirectoryName(Program.AuroraExecutable), "Patches"), "*.dll").ToList();
-            Program.StartAurora(patches);
+            var patches = Loader.FindPatches().ToList();
+            Loader.StartAurora(patches);
         }
     }
 }

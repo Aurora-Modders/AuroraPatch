@@ -9,11 +9,15 @@ namespace AuroraPatch
 {
     public abstract class Patch
     {
-        /// <summary>
-        /// The names of other patches this one depends on.
-        /// </summary>
-        protected abstract IEnumerable<string> Dependencies { get; }
-
+        public string Name => GetType().Name;
+        public virtual IEnumerable<string> Dependencies { get { return Enumerable.Empty<string>(); } }
+        public virtual string Description { get { return ""; } }
+        internal Loader Loader { get; set; }
+        protected string AuroraExecutable => Loader.AuroraExecutable;
+        protected string AuroraChecksum => Loader.AuroraChecksum;
+        protected Logger Logger => Program.Logger;
+        protected IEnumerable<Patch> LoadedPatches => Loader.LoadedPatches;
+        
         internal void LoadInternal(Assembly aurora)
         {
             Load(aurora);
@@ -41,7 +45,7 @@ namespace AuroraPatch
         /// </summary>
         protected object InvokeOnUIThread(Delegate method, params object[] args)
         {
-            return Program.InvokeOnUIThread(method, args);
+            return Loader.InvokeOnUIThread(method, args);
         }
     }
 }

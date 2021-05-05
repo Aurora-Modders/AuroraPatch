@@ -14,15 +14,13 @@ namespace ExamplePatch
 {
     public class ExamplePatch : AuroraPatch.Patch
     {
-        protected override IEnumerable<string> Dependencies => Enumerable.Empty<string>();
-
         protected override void Load(Assembly aurora)
         {
-            Program.Logger.LogInfo("Loading ExamplePatch...");
+            Logger.LogInfo("Loading ExamplePatch...");
 
             // get the exe and its checksum
-            var exe = Program.AuroraExecutable;
-            var checksum = Program.AuroraChecksum;
+            var exe = AuroraExecutable;
+            var checksum = AuroraChecksum;
 
             return;
 
