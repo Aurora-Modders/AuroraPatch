@@ -9,6 +9,11 @@ namespace AuroraPatch
 {
     public abstract class Patch
     {
+        /// <summary>
+        /// The names of other patches this one depends on.
+        /// </summary>
+        protected abstract IEnumerable<string> Dependencies { get; }
+
         internal void LoadInternal(Assembly aurora)
         {
             Load(aurora);
