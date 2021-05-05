@@ -1,11 +1,8 @@
 using System;
 using System.IO;
-using System.Threading;
-using System.Reflection;
 using System.Diagnostics;
 using System.Windows.Forms;
 using System.Security.Cryptography;
-using System.Collections.Generic;
 
 namespace AuroraPatch
 {

@@ -41,8 +41,9 @@ namespace AuroraPatch
         internal List<Patch> FindPatches()
         {
             var patches = new List<Patch>();
-
-            foreach (var dll in Directory.EnumerateFiles(Path.Combine(Path.GetDirectoryName(AuroraExecutable), "Patches"), "*.dll"))
+            string patchesDirectory = Path.Combine(Path.GetDirectoryName(AuroraExecutable), "Patches");
+            Directory.CreateDirectory(patchesDirectory);
+            foreach (var dll in Directory.EnumerateFiles(patchesDirectory, "*.dll"))
             {
                 foreach (var type in Assembly.LoadFrom(dll).GetTypes())
                 {
