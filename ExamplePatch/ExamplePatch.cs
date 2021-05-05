@@ -8,11 +8,14 @@ using HarmonyLib;
 using AuroraPatch;
 using System.IO;
 using System.Drawing;
+using System.Collections.Generic;
 
 namespace ExamplePatch
 {
     public class ExamplePatch : AuroraPatch.Patch
     {
+        protected override IEnumerable<string> Dependencies => Enumerable.Empty<string>();
+
         protected override void Load(Assembly aurora)
         {
             Program.Logger.LogInfo("Loading ExamplePatch...");

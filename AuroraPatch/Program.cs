@@ -13,7 +13,8 @@ namespace AuroraPatch
     {
         public static string AuroraExecutable { get; private set; } = null;
         public static string AuroraChecksum { get; private set; } = null;
-        public static Logger Logger = new Logger();
+        public static readonly Logger Logger = new Logger();
+        public static IEnumerable<Patch> LoadedPatches => Patches;
 
         private static Form TacticalMap { get; set; } = null;
         private static readonly List<Patch> Patches = new List<Patch>();
@@ -170,6 +171,7 @@ namespace AuroraPatch
 
                 string checksum = str.Replace("/", "").Replace("+", "").Replace("=", "").Substring(0, 6);
                 Logger.LogDebug("Checksum: " + checksum);
+
                 return checksum;
             }
         }
