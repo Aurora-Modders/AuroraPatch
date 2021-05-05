@@ -1,4 +1,5 @@
 ﻿using AuroraPatch;
+using HarmonyLib;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,11 +9,11 @@ using System.Windows.Forms;
 
 namespace Lib
 {
-    public class Lib : Patch
+    public class Lib : AuroraPatch.Patch
     {
         public TypeManager TypeManager { get; private set; } = null;
 
-        protected override void Load(Assembly aurora)
+        protected override void Load(Assembly aurora, Harmony harmony)
         {
             TypeManager = new TypeManager(aurora, Logger);
         }
