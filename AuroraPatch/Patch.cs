@@ -20,15 +20,16 @@ namespace AuroraPatch
         protected string AuroraChecksum => Loader.AuroraChecksum;
         protected Logger Logger => Program.Logger;
         protected IEnumerable<Patch> LoadedPatches => Loader.LoadedPatches;
+        protected Form TacticalMap => Loader.TacticalMap;
         
         internal void LoadInternal(Assembly aurora)
         {
             Load(aurora, new Harmony(Name));
         }
 
-        internal void StartInternal(Form map)
+        internal void StartInternal()
         {
-            Start(map);
+            Start();
         }
 
         internal void ChangeSettingsInternal()
@@ -37,7 +38,8 @@ namespace AuroraPatch
         }
 
         /// <summary>
-        /// Called before the game is started. Use this to patch methods etc.
+        /// Called before the game is started. Use this to patch methods etc. 
+        /// TacticalMap will be null and you can not invoke code on Aurora's UI Thread.
         /// </summary>
         /// <param name="aurora"></param>
         protected virtual void Load(Assembly aurora, Harmony harmony)
@@ -46,10 +48,9 @@ namespace AuroraPatch
         }
 
         /// <summary>
-        /// Called after game start. You can now invoke code on Aurora's UI thread.
+        /// Called after game start. You can now invoke code on Aurora's UI thread and access the TacticalMap.
         /// </summary>
-        /// /// <param name="map"></param>
-        protected virtual void Start(Form map)
+        protected virtual void Start()
         {
 
         }

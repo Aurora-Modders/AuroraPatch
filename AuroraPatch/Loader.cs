@@ -14,8 +14,8 @@ namespace AuroraPatch
         internal readonly string AuroraExecutable;
         internal readonly string AuroraChecksum;
         internal readonly List<Patch> LoadedPatches = new List<Patch>();
+        internal Form TacticalMap { get; set; } = null;
 
-        private Form TacticalMap { get; set; } = null;
         private bool Started { get; set; } = false;
 
         internal Loader(string exe, string checksum)
@@ -131,7 +131,7 @@ namespace AuroraPatch
             Program.Logger.LogInfo("Starting patches");
             foreach (var patch in LoadedPatches)
             {
-                patch.StartInternal(TacticalMap);
+                patch.StartInternal();
             }
         }
 

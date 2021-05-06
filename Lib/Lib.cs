@@ -18,10 +18,5 @@ namespace Lib
         {
             TypeManager = new TypeManager(aurora, Logger);
         }
-
-        protected override void Start(Form map)
-        {
-
-        }
     }
 }
