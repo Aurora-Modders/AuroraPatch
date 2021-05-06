@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -35,8 +36,14 @@ namespace Lib
             {
                 if (DateTime.UtcNow > NextUpdate)
                 {
+                    var sw = new Stopwatch();
+                    sw.Start();
+
                     Lib.InvokeOnUIThread(new Action(() => Save()));
                     NextUpdate = DateTime.UtcNow + TimeSpan.FromSeconds(30);
+
+                    sw.Stop();
+                    Lib.Logger.LogInfo($"Save took {sw.ElapsedMilliseconds} ms");
                 }
                 
                 using (var connection = new SQLiteConnection(Connection.ConnectionString))
@@ -74,6 +81,8 @@ namespace Lib
                 return;
             }
 
+            object connection = null;
+            object transaction = null;
             foreach (var function in functions.Split(','))
             {
                 var method = game.GetType().GetMethods(AccessTools.all).Single(m =>
@@ -98,15 +107,47 @@ namespace Lib
                     return true;
                 });
 
-                var type = method.GetParameters()[0].ParameterType;
-                var par = Activator.CreateInstance(type, Connection.ConnectionString);
-                par.GetType().GetMethod("Open").Invoke(par, new object[0]);
+                if (connection == null)
+                {
+                    var type = method.GetParameters()[0].ParameterType;
+                    connection = Activator.CreateInstance(type, Connection.ConnectionString);
+                    connection.GetType().GetMethod("Open").Invoke(connection, new object[0]);
 
-                method.Invoke(game, new object[] { par });
+                    var begintransaction = connection.GetType().GetMethods().Single(m =>
+                    {
+                        if (m.Name != "BeginTransaction")
+                        {
+                            return false;
+                        }
 
-                par.GetType().GetMethod("Close").Invoke(par, new object[0]);
+                        if (m.ReturnType.Name != "SQLiteTransaction")
+                        {
+                            return false;
+                        }
 
-                Lib.Logger.LogInfo($"Called function {function}");
+                        if (m.GetParameters().Count() != 0)
+                        {
+                            return false;
+                        }
+
+                        return true;
+                    });
+
+                    transaction = begintransaction.Invoke(connection, new object[0]);
+                }
+
+                method.Invoke(game, new object[] { connection });
+                Lib.Logger.LogDebug($"Called function {function}");
+            }
+
+            if (transaction != null)
+            {
+                transaction.GetType().GetMethod("Commit").Invoke(transaction, new object[0]);
+            }
+
+            if (connection != null)
+            {
+                connection.GetType().GetMethod("Close").Invoke(connection, new object[0]);
             }
         }
 
@@ -133,7 +174,6 @@ namespace Lib
                             var sql = (string)entry;
                             if (!sql.Contains("sqlite_"))
                             {
-
                                 commands.Add(sql);
                             }
                         }
@@ -147,11 +187,9 @@ namespace Lib
             Connection = new SQLiteConnection("FullUri=file::memory:?cache=shared;");
             Connection.Open();
 
-            Lib.Logger.LogInfo($"Db Connection: {Connection.FileName}");
-
             foreach (var sql in commands)
             {
-                Lib.Logger.LogInfo($"executing sql: {sql}");
+                Lib.Logger.LogDebug($"executing sql: {sql}");
 
                 var command = Connection.CreateCommand();
                 command.CommandText = sql;
