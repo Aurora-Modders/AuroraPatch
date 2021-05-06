@@ -35,7 +35,7 @@ namespace Lib
             {
                 if (DateTime.UtcNow > NextUpdate)
                 {
-                    Save();
+                    Lib.InvokeOnUIThread(new Action(() => Save()));
                     NextUpdate = DateTime.UtcNow + TimeSpan.FromSeconds(30);
                 }
                 
