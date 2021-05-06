@@ -32,6 +32,8 @@ namespace AuroraPatch
             this.ButtonStart = new System.Windows.Forms.Button();
             this.ListPatches = new System.Windows.Forms.ListBox();
             this.LabelPatches = new System.Windows.Forms.Label();
+            this.LabelDescription = new System.Windows.Forms.Label();
+            this.ButtonChangeSettings = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // ButtonStart
@@ -51,6 +53,7 @@ namespace AuroraPatch
             this.ListPatches.Name = "ListPatches";
             this.ListPatches.Size = new System.Drawing.Size(205, 238);
             this.ListPatches.TabIndex = 1;
+            this.ListPatches.SelectedIndexChanged += new System.EventHandler(this.ListPatches_SelectedIndexChanged);
             // 
             // LabelPatches
             // 
@@ -61,11 +64,32 @@ namespace AuroraPatch
             this.LabelPatches.TabIndex = 2;
             this.LabelPatches.Text = "Found patches:";
             // 
+            // LabelDescription
+            // 
+            this.LabelDescription.AutoSize = true;
+            this.LabelDescription.Location = new System.Drawing.Point(247, 53);
+            this.LabelDescription.Name = "LabelDescription";
+            this.LabelDescription.Size = new System.Drawing.Size(63, 13);
+            this.LabelDescription.TabIndex = 3;
+            this.LabelDescription.Text = "Description:";
+            // 
+            // ButtonChangeSettings
+            // 
+            this.ButtonChangeSettings.Location = new System.Drawing.Point(251, 91);
+            this.ButtonChangeSettings.Name = "ButtonChangeSettings";
+            this.ButtonChangeSettings.Size = new System.Drawing.Size(141, 41);
+            this.ButtonChangeSettings.TabIndex = 4;
+            this.ButtonChangeSettings.Text = "Change settings";
+            this.ButtonChangeSettings.UseVisualStyleBackColor = true;
+            this.ButtonChangeSettings.Click += new System.EventHandler(this.ButtonChangeSettings_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.ButtonChangeSettings);
+            this.Controls.Add(this.LabelDescription);
             this.Controls.Add(this.LabelPatches);
             this.Controls.Add(this.ListPatches);
             this.Controls.Add(this.ButtonStart);
@@ -81,5 +105,7 @@ namespace AuroraPatch
         private System.Windows.Forms.Button ButtonStart;
         private System.Windows.Forms.ListBox ListPatches;
         private System.Windows.Forms.Label LabelPatches;
+        private System.Windows.Forms.Label LabelDescription;
+        private System.Windows.Forms.Button ButtonChangeSettings;
     }
 }

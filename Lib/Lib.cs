@@ -11,6 +11,7 @@ namespace Lib
 {
     public class Lib : AuroraPatch.Patch
     {
+        public override string Description => "A library of useful features for patch creators.";
         public TypeManager TypeManager { get; private set; } = null;
 
         protected override void Load(Assembly aurora, Harmony harmony)

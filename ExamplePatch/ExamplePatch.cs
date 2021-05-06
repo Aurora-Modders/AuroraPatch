@@ -13,6 +13,9 @@ namespace ExamplePatch
 {
     public class ExamplePatch : AuroraPatch.Patch
     {
+        public static Color BackColor { get; set; } = Color.Black;
+
+        public override string Description => "An example patch.";
         public override IEnumerable<string> Dependencies { get { return new[] { "Lib" }; } }
 
         protected override void Load(Assembly aurora, Harmony harmony)
@@ -40,10 +43,26 @@ namespace ExamplePatch
             InvokeOnUIThread(action);
         }
 
+        protected override void ChangeSettings()
+        {
+            base.ChangeSettings();
+
+            // pick TacticalMap background color
+
+            var diag = new ColorDialog();
+            diag.Color = BackColor;
+            
+            var result = diag.ShowDialog();
+            if (result == DialogResult.OK)
+            {
+                BackColor = diag.Color;
+            }
+        }
+
         private static void PatchTacticalMapConstructor(Form __instance)
         {
             // set background color to black
-            __instance.BackColor = Color.Black;
+            __instance.BackColor = BackColor;
 
             MessageBox.Show("Harmony patched!");
         }

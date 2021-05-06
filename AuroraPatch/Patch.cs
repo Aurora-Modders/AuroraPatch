@@ -10,8 +10,9 @@ namespace AuroraPatch
     public abstract class Patch
     {
         public string Name => GetType().Name;
-        public virtual IEnumerable<string> Dependencies { get { return Enumerable.Empty<string>(); } }
         public virtual string Description { get { return ""; } }
+        public virtual IEnumerable<string> Dependencies { get { return Enumerable.Empty<string>(); } }
+
         internal Loader Loader { get; set; }
         protected string AuroraExecutable => Loader.AuroraExecutable;
         protected string AuroraChecksum => Loader.AuroraChecksum;
@@ -28,17 +29,36 @@ namespace AuroraPatch
             Start(map);
         }
 
+        internal void ChangeSettingsInternal()
+        {
+            ChangeSettings();
+        }
+
         /// <summary>
         /// Called before the game is started. Use this to patch methods etc.
         /// </summary>
         /// <param name="aurora"></param>
-        protected abstract void Load(Assembly aurora, Harmony harmony);
+        protected virtual void Load(Assembly aurora, Harmony harmony)
+        {
+
+        }
 
         /// <summary>
         /// Called after game start. You can now invoke code on Aurora's UI thread.
         /// </summary>
         /// /// <param name="map"></param>
-        protected abstract void Start(Form map);
+        protected virtual void Start(Form map)
+        {
+
+        }
+
+        /// <summary>
+        /// Called when the user clicks "Change settings."
+        /// </summary>
+        protected virtual void ChangeSettings()
+        {
+
+        }
 
         /// <summary>
         /// Run code on Aurora's UI thread. Only available after game start.
