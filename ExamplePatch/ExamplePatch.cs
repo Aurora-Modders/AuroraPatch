@@ -18,6 +18,8 @@ namespace ExamplePatch
         public override string Description => "An example patch.";
         public override IEnumerable<string> Dependencies { get { return new[] { "Lib" }; } }
 
+        private Form TacticalMap { get; set; } = null;
+
         protected override void Load(Assembly aurora, Harmony harmony)
         {
             Logger.LogInfo("Loading ExamplePatch...");
@@ -38,6 +40,8 @@ namespace ExamplePatch
 
         protected override void Start(Form map)
         {
+            TacticalMap = map;
+
             // invoke arbitrary code on Aurora's UI thread
             var action = new Action(() => MessageBox.Show("Example patch loaded!"));
             InvokeOnUIThread(action);
@@ -56,6 +60,12 @@ namespace ExamplePatch
             if (result == DialogResult.OK)
             {
                 BackColor = diag.Color;
+
+                if (TacticalMap != null)
+                {
+                    var action = new Action(() => TacticalMap.BackColor = BackColor);
+                    InvokeOnUIThread(action);
+                }
             }
         }
 
