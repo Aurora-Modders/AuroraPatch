@@ -27,7 +27,7 @@ namespace AuroraPatch
 
         internal object InvokeOnUIThread(Delegate method, params object[] args)
         {
-            if (Started)
+            if (Started && TacticalMap.IsHandleCreated)
             {
                 return TacticalMap.Invoke(method, args);
             }
@@ -188,8 +188,6 @@ namespace AuroraPatch
             }
 
             Program.Logger.LogCritical("TacticalMap not found");
-            // If we expose more forms/functionality in the future, may want to make this an error instead
-            // and allow execution to continue as some patches may still work if not interfacing with the map.
             throw new Exception("TacticalMap not found");
         }
     }

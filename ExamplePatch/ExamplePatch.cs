@@ -37,7 +37,7 @@ namespace ExamplePatch
 
             // dependency
             var lib = (Lib.Lib)LoadedPatches.Single(p => p.Name == "Lib");
-            var map = lib.TypeManager.GetFormType(AuroraFormType.TacticalMap);
+            var map = lib.SignatureManager.Get(AuroraType.TacticalMapForm);
 
             // Harmony
             var ctor = (MethodBase)map.GetMember(".ctor", AccessTools.all)[0];

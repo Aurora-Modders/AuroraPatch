@@ -93,6 +93,16 @@ namespace Lib
                 signature.MaxFieldTypes.Add(kvp.Key.Name, kvp.Value + 5);
             }
 
+            var types = GetTypes(signature);
+            if (types.Count == 1)
+            {
+                signature.IsUniqueByChecksum.Add(Lib.AuroraChecksum, true);
+            }
+            else
+            {
+                signature.IsUniqueByChecksum.Add(Lib.AuroraChecksum, false);
+            }
+
             Signatures[name] = signature;
 
             Save();
@@ -178,7 +188,8 @@ namespace Lib
         {
             if (Lib.AuroraChecksum == "chm1c7")
             {
-                GenerateForType(AuroraType.TacticalMap, Lib.AuroraAssembly.GetType("jt"));
+                GenerateForType(AuroraType.TacticalMapForm, Lib.AuroraAssembly.GetType("jt"));
+                GenerateForType(AuroraType.EconomicsForm, Lib.AuroraAssembly.GetType("gz"));
             }
         }
     }
