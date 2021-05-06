@@ -4,6 +4,8 @@ using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
 using System.Collections.Generic;
+using Newtonsoft.Json;
+using System.IO;
 
 namespace AuroraPatch
 {
@@ -66,6 +68,50 @@ namespace AuroraPatch
         protected object InvokeOnUIThread(Delegate method, params object[] args)
         {
             return Loader.InvokeOnUIThread(method, args);
+        }
+
+        /// <summary>
+        /// Serialize arbitrary objects, useful for settings.
+        /// </summary>
+        protected void Serialize<T>(string id, T obj)
+        {
+            var serializer = new JsonSerializer
+            {
+                Formatting = Formatting.Indented
+            };
+
+            var dir = Path.Combine(Path.GetDirectoryName(AuroraExecutable), "Patches", Name);
+            Directory.CreateDirectory(dir);
+            var file = Path.Combine(dir, id + ".json");
+
+            using (var reader = new StreamWriter(file))
+            using (var json = new JsonTextWriter(reader))
+            {
+                serializer.Serialize(json, obj);
+            }
+        }
+
+        /// <summary>
+        /// Deserialize arbitrary objects, useful for settings.
+        /// </summary>
+        protected T Deserialize<T>(string id)
+        {
+            var serializer = new JsonSerializer
+            {
+                Formatting = Formatting.Indented
+            };
+
+            var file = Path.Combine(Path.GetDirectoryName(AuroraExecutable), "Patches", Name, id + ".json");
+            if (!File.Exists(file))
+            {
+                throw new IOException($"Resource {id} not found");
+            }
+
+            using (var reader = new StreamReader(file))
+            using (var json = new JsonTextReader(reader))
+            {
+                return serializer.Deserialize<T>(json);
+            }
         }
     }
 }

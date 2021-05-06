@@ -24,6 +24,15 @@ namespace ExamplePatch
         {
             Logger.LogInfo("Loading ExamplePatch...");
 
+            try
+            {
+                BackColor = Deserialize<Color>("color");
+            }
+            catch (Exception e)
+            {
+                Logger.LogInfo("saved color not found");
+            }
+
             // get the exe and its checksum
             var exe = AuroraExecutable;
             var checksum = AuroraChecksum;
@@ -66,6 +75,8 @@ namespace ExamplePatch
                     var action = new Action(() => TacticalMap.BackColor = BackColor);
                     InvokeOnUIThread(action);
                 }
+
+                Serialize("color", BackColor);
             }
         }
 
