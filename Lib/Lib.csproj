@@ -47,6 +47,7 @@
   <ItemGroup>
     <Compile Include="Lib.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SignatureManager.cs" />
     <Compile Include="TypeManager.cs" />
   </ItemGroup>
   <ItemGroup>

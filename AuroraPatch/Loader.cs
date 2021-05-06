@@ -14,6 +14,7 @@ namespace AuroraPatch
         internal readonly string AuroraExecutable;
         internal readonly string AuroraChecksum;
         internal readonly List<Patch> LoadedPatches = new List<Patch>();
+        internal Assembly AuroraAssembly { get; set; } = null;
         internal Form TacticalMap { get; set; } = null;
 
         private bool Started { get; set; } = false;
@@ -54,7 +55,9 @@ namespace AuroraPatch
                         {
                             if (typeof(Patch).IsAssignableFrom(type))
                             {
-                                patches.Add((Patch)Activator.CreateInstance(type));
+                                var patch = (Patch)Activator.CreateInstance(type);
+                                patch.Loader = this;
+                                patches.Add(patch);
                             }
                         }
                     }
@@ -113,20 +116,19 @@ namespace AuroraPatch
             Started = false;
 
             Program.Logger.LogInfo("Loading assembly " + AuroraExecutable + " with checksum " + AuroraChecksum);
-            var assembly = Assembly.LoadFile(AuroraExecutable);
+            AuroraAssembly = Assembly.LoadFile(AuroraExecutable);
 
             Program.Logger.LogInfo("Loading patches");
             foreach (var patch in patches)
             {
                 Program.Logger.LogInfo("Applying patch " + patch.Name);
 
-                patch.Loader = this;
-                patch.LoadInternal(assembly);
+                patch.LoadInternal();
                 LoadedPatches.Add(patch);
             }
 
             Program.Logger.LogInfo("Starting Aurora");
-            TacticalMap = GetTacticalMap(assembly);
+            TacticalMap = GetTacticalMap(AuroraAssembly);
             TacticalMap.Shown += MapShown;
             TacticalMap.Show();
         }

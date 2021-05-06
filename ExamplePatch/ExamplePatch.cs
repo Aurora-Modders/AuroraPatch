@@ -18,7 +18,7 @@ namespace ExamplePatch
         public override string Description => "An example patch.";
         public override IEnumerable<string> Dependencies { get { return new[] { "Lib" }; } }
 
-        protected override void Load(Assembly aurora, Harmony harmony)
+        protected override void Load(Harmony harmony)
         {
             Logger.LogInfo("Loading ExamplePatch...");
 

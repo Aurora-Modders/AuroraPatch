@@ -13,10 +13,12 @@ namespace Lib
     {
         public override string Description => "A library of useful features for patch creators.";
         public TypeManager TypeManager { get; private set; } = null;
+        public SignatureManager SignatureManager { get; private set; } = null;
 
-        protected override void Load(Assembly aurora, Harmony harmony)
+        protected override void Load(Harmony harmony)
         {
-            TypeManager = new TypeManager(aurora, Logger);
+            TypeManager = new TypeManager(AuroraAssembly, Logger);
+            SignatureManager = new SignatureManager(this);
         }
     }
 }
