@@ -13,37 +13,20 @@ namespace Lib
         {
             public string Name { get; set; } = "";
             public Dictionary<string, bool> IsUniqueByChecksum { get; set; } = new Dictionary<string, bool>();
-            public int MinFields { get; set; } = 0;
-            public int MaxFields { get; set; } = 0;
             public Dictionary<string, int> MinFieldTypes { get; set; } = new Dictionary<string, int>();
             public Dictionary<string, int> MaxFieldTypes { get; set; } = new Dictionary<string, int>();
-
-            public List<Type> GetTypes(TypeManager manager)
-            {
-                var minfieldtypes = new List<Tuple<Type, int>>();
-                var maxfieldtypes = new List<Tuple<Type, int>>();
-
-                foreach (var kvp in MinFieldTypes)
-                {
-                    minfieldtypes.Add(new Tuple<Type, int>(Type.GetType(kvp.Key), kvp.Value));
-                }
-
-                foreach (var kvp in MaxFieldTypes)
-                {
-                    maxfieldtypes.Add(new Tuple<Type, int>(Type.GetType(kvp.Key), kvp.Value));
-                }
-
-                return manager.GetAuroraTypes(minFields: MinFields, maxFields: MaxFields, minFieldTypes: minfieldtypes, maxFieldTypes: maxfieldtypes).ToList();
-            }
         }
 
         private readonly Lib Lib;
         private readonly Dictionary<string, Signature> Signatures = new Dictionary<string, Signature>();
         private readonly Dictionary<string, Type> TypeCache = new Dictionary<string, Type>();
+        public IEnumerable<string> KnownSignatures => Signatures.Keys;
 
         public SignatureManager(Lib lib)
         {
             Lib = lib;
+            Load();
+            GenerateKnownTypes();
         }
 
         public bool TryGet(string name, out Type type)
@@ -59,8 +42,7 @@ namespace Lib
             {
                 if (!signature.IsUniqueByChecksum.ContainsKey(Lib.AuroraChecksum))
                 {
-                    var types = signature.GetTypes(Lib.TypeManager);
-
+                    var types = GetTypes(signature);
                     if (types.Count == 1)
                     {
                         signature.IsUniqueByChecksum.Add(Lib.AuroraChecksum, true);
@@ -73,7 +55,7 @@ namespace Lib
 
                 if (signature.IsUniqueByChecksum[Lib.AuroraChecksum])
                 {
-                    type = signature.GetTypes(Lib.TypeManager).First();
+                    type = GetTypes(signature).First();
                     TypeCache[name] = type;
 
                     return true;
@@ -86,14 +68,13 @@ namespace Lib
 
         public void GenerateForType(string name, Type type)
         {
-            var fields = 0;
             var fieldtypes = new Dictionary<Type, int>();
 
             foreach (var field in type.GetFields(AccessTools.all))
             {
-                fields++;
-
-                if (field.FieldType.Assembly != Lib.AuroraAssembly)
+                if (field.FieldType.Assembly != Lib.AuroraAssembly 
+                    && field.FieldType.IsGenericType == false
+                    && field.FieldType.IsInterface == false)
                 {
                     if (!fieldtypes.ContainsKey(field.FieldType))
                     {
@@ -107,8 +88,6 @@ namespace Lib
             var signature = new Signature()
             {
                 Name = name,
-                MinFields = fields - 5,
-                MaxFields = fields + 5
             };
 
             foreach (var kvp in fieldtypes)
@@ -118,6 +97,8 @@ namespace Lib
             }
 
             Signatures[name] = signature;
+
+            Save();
         }
 
         private void Load()
@@ -142,6 +123,66 @@ namespace Lib
         {
             var signatures = Signatures.Values.ToList();
             Lib.Serialize("signatures", signatures);
+        }
+
+        private List<Type> GetTypes(Signature signature)
+        {
+            var types = new List<Type>();
+            var fieldtypes = new Dictionary<string, int>();
+
+            foreach (var type in Lib.AuroraAssembly.GetTypes())
+            {
+                fieldtypes.Clear();
+                var good = true;
+
+                foreach (var field in type.GetFields(AccessTools.all))
+                {
+                    var name = field.FieldType.Name;
+                    if (!fieldtypes.ContainsKey(name))
+                    {
+                        fieldtypes.Add(name, 0);
+                    }
+
+                    fieldtypes[name]++;
+                }
+
+                foreach (var min in signature.MinFieldTypes)
+                {
+                    var count = fieldtypes.ContainsKey(min.Key) ? fieldtypes[min.Key] : 0;
+
+                    if (count < min.Value)
+                    {
+                        good = false;
+                        break;
+                    }
+                }
+
+                foreach (var max in signature.MaxFieldTypes)
+                {
+                    var count = fieldtypes.ContainsKey(max.Key) ? fieldtypes[max.Key] : 0;
+
+                    if (count > max.Value)
+                    {
+                        good = false;
+                        break;
+                    }
+                }
+
+                if (good)
+                {
+                    types.Add(type);
+                }
+            }
+
+            return types;
+        }
+
+        private void GenerateKnownTypes()
+        {
+            if (Lib.AuroraChecksum == "chm1c7")
+            {
+                GenerateForType("TacticalMap", Lib.AuroraAssembly.GetType("jt"));
+            }
         }
     }
 }
