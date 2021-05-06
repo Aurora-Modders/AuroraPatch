@@ -21,7 +21,7 @@ namespace Lib
         private readonly Dictionary<AuroraType, Signature> Signatures = new Dictionary<AuroraType, Signature>();
         private readonly Dictionary<AuroraType, Type> TypeCache = new Dictionary<AuroraType, Type>();
 
-        public SignatureManager(Lib lib)
+        internal SignatureManager(Lib lib)
         {
             Lib = lib;
             Load();

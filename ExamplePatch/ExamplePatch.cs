@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using HarmonyLib;
 using AuroraPatch;
 using Lib;
+using System.Data;
 
 namespace ExamplePatch
 {
@@ -47,8 +48,18 @@ namespace ExamplePatch
 
         protected override void Start()
         {
+            // read in-memory db
+            var lib = (Lib.Lib)LoadedPatches.Single(p => p.Name == "Lib");
+            var table = lib.DatabaseManager.ExecuteQuery("SELECT RaceName FROM FCT_Race");
+
             // invoke arbitrary code on Aurora's UI thread
-            var action = new Action(() => MessageBox.Show("Example patch loaded!"));
+            var message = "Example patch loaded!\n";
+            foreach (DataRow row in table.Rows)
+            {
+                message += $"Race name: {row[0]}\n";
+            }
+
+            var action = new Action(() => MessageBox.Show(message));
             InvokeOnUIThread(action);
         }
 
