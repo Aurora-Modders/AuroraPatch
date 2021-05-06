@@ -78,6 +78,23 @@ namespace AuroraPatch
             });
         }
 
+        internal IEnumerable<KeyValuePair<Patch, string>> GetUnmetDependencies(List<Patch> patches)
+        {
+            var available = new HashSet<string>();
+            patches.ForEach(p => available.Add(p.Name));
+
+            foreach (var patch in patches)
+            {
+                foreach (var dep in patch.Dependencies)
+                {
+                    if (!available.Contains(dep))
+                    {
+                        yield return new KeyValuePair<Patch, string>(patch, dep);
+                    }
+                }
+            }
+        }
+
         internal void StartAurora(List<Patch> patches)
         {
             TacticalMap = null;

@@ -24,6 +24,13 @@ namespace AuroraPatch
 
         private void ButtonStart_Click(object sender, EventArgs e)
         {
+            foreach (var missing in Loader.GetUnmetDependencies(Patches))
+            {
+                MessageBox.Show($"Patch {missing.Key.Name} missing dependency {missing.Value}");
+                
+                return;
+            }
+
             Loader.StartAurora(Patches);
         }
 
