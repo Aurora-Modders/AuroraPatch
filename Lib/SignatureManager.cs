@@ -30,33 +30,50 @@ namespace Lib
 
         public Type Get(AuroraType name)
         {
-            if (TypeCache.ContainsKey(name))
+            lock (TypeCache)
             {
-                return TypeCache[name];
+                if (TypeCache.ContainsKey(name))
+                {
+                    return TypeCache[name];
+                }
             }
 
-            if (Signatures.TryGetValue(name, out Signature signature))
+            Signature signature = null;
+            lock (Signatures)
             {
-                if (!signature.IsUniqueByChecksum.ContainsKey(Lib.AuroraChecksum))
+                if (Signatures.ContainsKey(name))
                 {
-                    var types = GetTypes(signature);
-                    if (types.Count == 1)
-                    {
-                        signature.IsUniqueByChecksum.Add(Lib.AuroraChecksum, true);
-                    }
-                    else
-                    {
-                        signature.IsUniqueByChecksum.Add(Lib.AuroraChecksum, false);
-                    }
+                    signature = Signatures[name];
                 }
+            }
 
-                if (signature.IsUniqueByChecksum[Lib.AuroraChecksum])
+            if (signature == null)
+            {
+                return null;
+            }
+
+            if (!signature.IsUniqueByChecksum.ContainsKey(Lib.AuroraChecksum))
+            {
+                var types = GetTypes(signature);
+                if (types.Count == 1)
                 {
-                    var type = GetTypes(signature).First();
+                    signature.IsUniqueByChecksum.Add(Lib.AuroraChecksum, true);
+                }
+                else
+                {
+                    signature.IsUniqueByChecksum.Add(Lib.AuroraChecksum, false);
+                }
+            }
+
+            if (signature.IsUniqueByChecksum[Lib.AuroraChecksum])
+            {
+                var type = GetTypes(signature).First();
+                lock (TypeCache)
+                {
                     TypeCache[name] = type;
-
-                    return type;
                 }
+                
+                return type;
             }
 
             return null;
@@ -102,33 +119,42 @@ namespace Lib
                 signature.IsUniqueByChecksum.Add(Lib.AuroraChecksum, false);
             }
 
-            Signatures[name] = signature;
+            lock (Signatures)
+            {
+                Signatures[name] = signature;
+            }
 
             Save();
         }
 
         private void Load()
         {
-            Signatures.Clear();
+            lock (Signatures)
+            {
+                Signatures.Clear();
 
-            try
-            {
-                var signatures = Lib.Deserialize<List<Signature>>("signatures");
-                foreach (var signature in signatures)
+                try
                 {
-                    Signatures.Add(signature.Name, signature);
+                    var signatures = Lib.Deserialize<List<Signature>>("signatures");
+                    foreach (var signature in signatures)
+                    {
+                        Signatures.Add(signature.Name, signature);
+                    }
                 }
-            }
-            catch (Exception)
-            {
-                Lib.Logger.LogInfo("Signatures not found.");
+                catch (Exception)
+                {
+                    Lib.Logger.LogInfo("Signatures not found.");
+                }
             }
         }
 
         private void Save()
         {
-            var signatures = Signatures.Values.ToList();
-            Lib.Serialize("signatures", signatures);
+            lock (Signatures)
+            {
+                var signatures = Signatures.Values.ToList();
+                Lib.Serialize("signatures", signatures);
+            }
         }
 
         private List<Type> GetTypes(Signature signature)
