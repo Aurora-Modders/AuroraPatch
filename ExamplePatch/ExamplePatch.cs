@@ -16,7 +16,7 @@ namespace ExamplePatch
         public static Color BackColor { get; set; } = Color.Black;
 
         public override string Description => "An example patch.";
-        public override IEnumerable<string> Dependencies { get { return new[] { "Lib" }; } }
+        public override IEnumerable<string> Dependencies => new[] { "Lib" };
 
         protected override void Load(Harmony harmony)
         {

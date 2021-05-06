@@ -11,16 +11,16 @@ namespace Lib
     {
         private class Signature
         {
-            public string Name { get; set; } = "";
+            public AuroraType Name { get; set; }
             public Dictionary<string, bool> IsUniqueByChecksum { get; set; } = new Dictionary<string, bool>();
             public Dictionary<string, int> MinFieldTypes { get; set; } = new Dictionary<string, int>();
             public Dictionary<string, int> MaxFieldTypes { get; set; } = new Dictionary<string, int>();
         }
 
         private readonly Lib Lib;
-        private readonly Dictionary<string, Signature> Signatures = new Dictionary<string, Signature>();
-        private readonly Dictionary<string, Type> TypeCache = new Dictionary<string, Type>();
-        public IEnumerable<string> KnownSignatures => Signatures.Keys;
+        private readonly Dictionary<AuroraType, Signature> Signatures = new Dictionary<AuroraType, Signature>();
+        private readonly Dictionary<AuroraType, Type> TypeCache = new Dictionary<AuroraType, Type>();
+        public IEnumerable<AuroraType> KnownAuroraTypes => Signatures.Keys;
 
         public SignatureManager(Lib lib)
         {
@@ -29,13 +29,11 @@ namespace Lib
             GenerateKnownTypes();
         }
 
-        public bool TryGet(string name, out Type type)
+        public Type Get(AuroraType name)
         {
             if (TypeCache.ContainsKey(name))
             {
-                type = TypeCache[name];
-
-                return true;
+                return TypeCache[name];
             }
 
             if (Signatures.TryGetValue(name, out Signature signature))
@@ -55,18 +53,17 @@ namespace Lib
 
                 if (signature.IsUniqueByChecksum[Lib.AuroraChecksum])
                 {
-                    type = GetTypes(signature).First();
+                    var type = GetTypes(signature).First();
                     TypeCache[name] = type;
 
-                    return true;
+                    return type;
                 }
             }
 
-            type = default(Type);
-            return false;
+            return null;
         }
 
-        public void GenerateForType(string name, Type type)
+        public void GenerateForType(AuroraType name, Type type)
         {
             var fieldtypes = new Dictionary<Type, int>();
 
@@ -181,7 +178,7 @@ namespace Lib
         {
             if (Lib.AuroraChecksum == "chm1c7")
             {
-                GenerateForType("TacticalMap", Lib.AuroraAssembly.GetType("jt"));
+                GenerateForType(AuroraType.TacticalMap, Lib.AuroraAssembly.GetType("jt"));
             }
         }
     }
