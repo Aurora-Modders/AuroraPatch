@@ -20,7 +20,6 @@ namespace Lib
         private readonly Lib Lib;
         private readonly Dictionary<AuroraType, Signature> Signatures = new Dictionary<AuroraType, Signature>();
         private readonly Dictionary<AuroraType, Type> TypeCache = new Dictionary<AuroraType, Type>();
-        public IEnumerable<AuroraType> KnownAuroraTypes => Signatures.Keys;
 
         public SignatureManager(Lib lib)
         {
@@ -190,6 +189,7 @@ namespace Lib
             {
                 GenerateForType(AuroraType.TacticalMapForm, Lib.AuroraAssembly.GetType("jt"));
                 GenerateForType(AuroraType.EconomicsForm, Lib.AuroraAssembly.GetType("gz"));
+                GenerateForType(AuroraType.GameState, Lib.AuroraAssembly.GetType("aw"));
             }
         }
     }

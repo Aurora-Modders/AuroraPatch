@@ -7,6 +7,6 @@ namespace Lib
 {
     public enum AuroraType
     {
-        TacticalMapForm, EconomicsForm
+        TacticalMapForm, EconomicsForm, GameState
     }
 }
