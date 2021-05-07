@@ -530,21 +530,21 @@
   {
     "Name": "RaceComparisonForm",
     "IsUniqueByChecksum": {
-      "chm1c7": false
+      "chm1c7": true
     },
     "MinFieldTypes": {
-      "ListView": 0,
-      "ColumnHeader": 0,
-      "Label": 0,
-      "Point": 0,
-      "Int32": 0
+      "ListView": 1,
+      "ColumnHeader": 1,
+      "Label": 1,
+      "Point": 1,
+      "Int32": 1
     },
     "MaxFieldTypes": {
-      "ListView": 2,
-      "ColumnHeader": 2,
-      "Label": 2,
-      "Point": 2,
-      "Int32": 2
+      "ListView": 1,
+      "ColumnHeader": 1,
+      "Label": 1,
+      "Point": 1,
+      "Int32": 1
     }
   },
   {
@@ -654,31 +654,31 @@
   {
     "Name": "SectorsForm",
     "IsUniqueByChecksum": {
-      "chm1c7": false
+      "chm1c7": true
     },
     "MinFieldTypes": {
-      "Boolean": 0,
-      "TreeView": 0,
-      "ComboBox": 0,
-      "ListBox": 0,
-      "FlowLayoutPanel": 0,
-      "Button": 0,
-      "ListView": 0,
-      "ColumnHeader": 1,
-      "Point": 0,
-      "Int32": 0
+      "Boolean": 1,
+      "TreeView": 1,
+      "ComboBox": 1,
+      "ListBox": 1,
+      "FlowLayoutPanel": 1,
+      "Button": 1,
+      "ListView": 1,
+      "ColumnHeader": 2,
+      "Point": 1,
+      "Int32": 1
     },
     "MaxFieldTypes": {
-      "Boolean": 2,
-      "TreeView": 2,
-      "ComboBox": 2,
-      "ListBox": 2,
-      "FlowLayoutPanel": 2,
-      "Button": 2,
-      "ListView": 2,
-      "ColumnHeader": 3,
-      "Point": 2,
-      "Int32": 2
+      "Boolean": 1,
+      "TreeView": 1,
+      "ComboBox": 1,
+      "ListBox": 1,
+      "FlowLayoutPanel": 1,
+      "Button": 1,
+      "ListView": 1,
+      "ColumnHeader": 2,
+      "Point": 1,
+      "Int32": 1
     }
   },
   {

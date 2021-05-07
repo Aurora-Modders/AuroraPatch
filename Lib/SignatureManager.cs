@@ -164,7 +164,7 @@ namespace Lib
             };
 
             signature.IsUniqueByChecksum.Add(Lib.AuroraChecksum, false);
-            var deltas = new[] { 10, 5, 3, 2, 1 };
+            var deltas = new[] { 10, 5, 3, 2, 1, 0 };
             foreach (var delta in deltas)
             {
                 foreach (var kvp in fieldtypes)
