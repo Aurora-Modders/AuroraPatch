@@ -48,17 +48,25 @@ namespace Example
 
         protected override void Start()
         {
+            var message = "Example patch loaded!\n";
+
             // read in-memory db
             var lib = (Lib.Lib)LoadedPatches.Single(p => p.Name == "Lib");
             var table = lib.DatabaseManager.ExecuteQuery("SELECT RaceName FROM FCT_Race");
 
-            // invoke arbitrary code on Aurora's UI thread
-            var message = "Example patch loaded!\n";
             foreach (DataRow row in table.Rows)
             {
                 message += $"Race name: {row[0]}\n";
             }
 
+            // get open forms
+            var forms = lib.GetOpenForms();
+            foreach (var form in forms)
+            {
+                message += $"Form name: {form.Name}";
+            }
+
+            // invoke arbitrary code on Aurora's UI thread
             var action = new Action(() => MessageBox.Show(message));
             InvokeOnUIThread(action);
         }
