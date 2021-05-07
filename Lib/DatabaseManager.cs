@@ -43,7 +43,7 @@ namespace Lib
                     NextUpdate = DateTime.UtcNow + TimeSpan.FromSeconds(30);
 
                     sw.Stop();
-                    Lib.Logger.LogInfo($"Save took {sw.ElapsedMilliseconds} ms");
+                    Lib.Logger.LogInfo($"In-memory save took {sw.ElapsedMilliseconds} ms");
                 }
                 
                 using (var connection = new SQLiteConnection(Connection.ConnectionString))
@@ -63,7 +63,7 @@ namespace Lib
 
         private void Save()
         {
-            var functions = GetSaveFunctions();
+            var functions = Lib.KnowledgeBase.GetSaveFunctions();
             if (functions == null)
             {
                 return;
@@ -75,7 +75,7 @@ namespace Lib
                 return;
             }
 
-            var game = GetGameState(map);
+            var game = Lib.KnowledgeBase.GetGameState(map);
             if (game == null)
             {
                 return;
@@ -194,24 +194,6 @@ namespace Lib
                 var command = Connection.CreateCommand();
                 command.CommandText = sql;
                 command.ExecuteNonQuery();
-            }
-        }
-
-        private object GetGameState(Form map)
-        {
-            switch (Lib.AuroraChecksum)
-            {
-                case "chm1c7": return map.GetType().GetField("a", AccessTools.all).GetValue(map);
-                default: return null;
-            }
-        }
-
-        private string GetSaveFunctions()
-        {
-            switch (Lib.AuroraChecksum)
-            {
-                case "chm1c7": return "g2,g3,g4,hd,he,hf,hk,hl,hm,i5,hn,ho,hp,hg,hq,hs,hr,ht,hu,h5,hw,hx,hy,hz,h0,h1,h2,h3,h4,h6,h7,hh,h8,h9,ia,ib,ic,id,ig,ih,ii,ij,ik,il,im,in,hv,io,ip,iq,ir,is,it,iy,iu,iv,iw,ix,iz,i0,i1,i2,i3,i4,i7,i8,i9,i6,hc,hi,hb,ha,g9,g8,g7,hj,ie,g5,g6";
-                default: return null;
             }
         }
     }

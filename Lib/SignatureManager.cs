@@ -25,7 +25,11 @@ namespace Lib
         {
             Lib = lib;
             Load();
-            GenerateKnownTypes();
+
+            foreach (var type in Lib.KnowledgeBase.GetKnownTypeNames())
+            {
+                GenerateForType(type.Key, Lib.AuroraAssembly.GetType(type.Value));
+            }
         }
 
         public Type Get(AuroraType name)
@@ -207,16 +211,6 @@ namespace Lib
             }
 
             return types;
-        }
-
-        private void GenerateKnownTypes()
-        {
-            if (Lib.AuroraChecksum == "chm1c7")
-            {
-                GenerateForType(AuroraType.TacticalMapForm, Lib.AuroraAssembly.GetType("jt"));
-                GenerateForType(AuroraType.EconomicsForm, Lib.AuroraAssembly.GetType("gz"));
-                GenerateForType(AuroraType.GameState, Lib.AuroraAssembly.GetType("aw"));
-            }
         }
     }
 }
