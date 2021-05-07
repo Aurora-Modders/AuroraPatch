@@ -37,7 +37,20 @@ namespace AuroraPatch
 
             var checksum = GetChecksum(File.ReadAllBytes(exe));
             var loader = new Loader(exe, checksum);
-            
+
+            AppDomain.CurrentDomain.AssemblyResolve += (sender, a) =>
+            {
+                foreach (var assembly in ((AppDomain)sender).GetAssemblies())
+                {
+                    if (assembly.FullName == a.Name)
+                    {
+                        return assembly;
+                    }
+                }
+
+                return null;
+            };
+
             Application.Run(new Form1(loader));
         }
 

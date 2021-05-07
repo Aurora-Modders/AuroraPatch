@@ -138,5 +138,14 @@ namespace Lib
 
             return buttons;
         }
+
+        public string GetFormOpenButtonName(AuroraType type)
+        {
+            switch (type)
+            {
+                case AuroraType.EconomicsForm: return "cmdToolbarColony";
+                default: return null;
+            }
+        }
     }
 }

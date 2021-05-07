@@ -29,25 +29,36 @@ namespace AuroraPatch
             string patchesDirectory = Path.Combine(Path.GetDirectoryName(AuroraExecutable), "Patches");
             Directory.CreateDirectory(patchesDirectory);
 
+            var assemblies = new List<Assembly>();
             foreach (var dir in Directory.EnumerateDirectories(patchesDirectory))
             {
+                Program.Logger.LogInfo($"Looking for dll's in {dir}");
                 foreach (var dll in Directory.EnumerateFiles(dir, "*.dll"))
                 {
                     try
                     {
-                        foreach (var type in Assembly.LoadFrom(dll).GetTypes())
-                        {
-                            if (typeof(Patch).IsAssignableFrom(type))
-                            {
-                                var patch = (Patch)Activator.CreateInstance(type);
-                                patch.Loader = this;
-                                patches.Add(patch);
-                            }
-                        }
+                        var assembly = Assembly.LoadFrom(dll);
+                        assemblies.Add(assembly);
+
+                        Program.Logger.LogInfo($"Found asembly {Path.GetFileName(dll)}");
                     }
                     catch (Exception)
                     {
                         Program.Logger.LogDebug($"File {dll} can not be loaded as Assembly.");
+                    }
+                }
+            }
+
+            foreach (var assembly in assemblies)
+            {
+                foreach (var type in assembly.GetTypes())
+                {
+                    if (typeof(Patch).IsAssignableFrom(type))
+                    {
+                        Program.Logger.LogInfo($"Found patch {type.Name}");
+                        var patch = (Patch)Activator.CreateInstance(type);
+                        patch.Loader = this;
+                        patches.Add(patch);
                     }
                 }
             }
