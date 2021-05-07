@@ -68,7 +68,7 @@ namespace Lib
                     continue;
                 }
 
-                Lib.LogInfo($"GameState field {field.Name}");
+                Lib.LogDebug($"GameState field {field.Name}");
 
                 return field.GetValue(map);
             }
@@ -106,7 +106,7 @@ namespace Lib
             return methods;
         }
 
-        public List<Button> GetTimeIncrementButtns()
+        public List<Button> GetTimeIncrementButtons()
         {
             var buttons = new List<Button>();
 
@@ -128,6 +128,11 @@ namespace Lib
                     {
                         buttons.Add(button);
                     }
+                }
+
+                foreach (Control c in control.Controls)
+                {
+                    stack.Push(c);
                 }
             }
 

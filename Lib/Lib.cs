@@ -46,25 +46,6 @@ namespace Lib
         protected override void Start()
         {
             DatabaseManager = new DatabaseManager(this);
-
-            LogInfo("Finding controls");
-            var stack = new Stack<Control>();
-            stack.Push(TacticalMap);
-            while (stack.Count > 0)
-            {
-                var control = stack.Pop();
-                //LogInfo($"Control {control.Name}");
-
-                if (control is Button button)
-                {
-                    LogInfo($"Button {button.Name}");
-                }
-
-                foreach (Control c in control.Controls)
-                {
-                    stack.Push(c);
-                }
-            }
         }
 
         private static void PostfixFormConstructor(Form __instance)
