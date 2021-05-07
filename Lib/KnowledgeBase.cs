@@ -105,5 +105,33 @@ namespace Lib
 
             return methods;
         }
+
+        public List<Button> GetTimeIncrementButtns()
+        {
+            var buttons = new List<Button>();
+
+            if (Lib.TacticalMap == null)
+            {
+                return buttons;
+            }
+
+            var stack = new Stack<Control>();
+            stack.Push(Lib.TacticalMap);
+
+            while (stack.Count > 0)
+            {
+                var control = stack.Pop();
+
+                if (control is Button button)
+                {
+                    if (button.Name.Contains("cmdIncrement"))
+                    {
+                        buttons.Add(button);
+                    }
+                }
+            }
+
+            return buttons;
+        }
     }
 }

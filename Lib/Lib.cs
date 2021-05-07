@@ -18,7 +18,6 @@ namespace Lib
         public DatabaseManager DatabaseManager { get; private set; } = null;
 
         private static readonly HashSet<Form> OpenForms = new HashSet<Form>();
-        private static Lib ThisLib { get; set; } = null;
 
         public List<Form> GetOpenForms()
         {
@@ -33,8 +32,6 @@ namespace Lib
 
         protected override void Load(Harmony harmony)
         {
-            ThisLib = this;
-
             KnowledgeBase = new KnowledgeBase(this);
             SignatureManager = new SignatureManager(this);
 
@@ -49,6 +46,25 @@ namespace Lib
         protected override void Start()
         {
             DatabaseManager = new DatabaseManager(this);
+
+            LogInfo("Finding controls");
+            var stack = new Stack<Control>();
+            stack.Push(TacticalMap);
+            while (stack.Count > 0)
+            {
+                var control = stack.Pop();
+                //LogInfo($"Control {control.Name}");
+
+                if (control is Button button)
+                {
+                    LogInfo($"Button {button.Name}");
+                }
+
+                foreach (Control c in control.Controls)
+                {
+                    stack.Push(c);
+                }
+            }
         }
 
         private static void PostfixFormConstructor(Form __instance)
@@ -62,13 +78,6 @@ namespace Lib
             lock (OpenForms)
             {
                 OpenForms.Add((Form)sender);
-            }
-
-            if (ThisLib != null)
-            {
-                var form = (Form)sender;
-
-                ThisLib.LogInfo($"Form name {form.Name} type {form.GetType().Name} opened");
             }
         }
 
