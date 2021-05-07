@@ -10,7 +10,7 @@ using AuroraPatch;
 using Lib;
 using System.Data;
 
-namespace ExamplePatch
+namespace Example
 {
     public class Example : AuroraPatch.Patch
     {
