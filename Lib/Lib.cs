@@ -18,6 +18,7 @@ namespace Lib
         public DatabaseManager DatabaseManager { get; private set; } = null;
 
         private static readonly HashSet<Form> OpenForms = new HashSet<Form>();
+        private static Lib ThisLib { get; set; } = null;
 
         public List<Form> GetOpenForms()
         {
@@ -32,6 +33,8 @@ namespace Lib
 
         protected override void Load(Harmony harmony)
         {
+            ThisLib = this;
+
             KnowledgeBase = new KnowledgeBase(this);
             SignatureManager = new SignatureManager(this);
 
@@ -59,6 +62,13 @@ namespace Lib
             lock (OpenForms)
             {
                 OpenForms.Add((Form)sender);
+            }
+
+            if (ThisLib != null)
+            {
+                var form = (Form)sender;
+
+                ThisLib.LogInfo($"Form name {form.Name} type {form.GetType().Name} opened");
             }
         }
 

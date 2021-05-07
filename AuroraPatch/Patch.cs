@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using System.IO;
+using Newtonsoft.Json.Converters;
 
 namespace AuroraPatch
 {
@@ -48,6 +49,7 @@ namespace AuroraPatch
             {
                 Formatting = Formatting.Indented
             };
+            serializer.Converters.Add(new StringEnumConverter());
 
             var dir = Path.Combine(Path.GetDirectoryName(AuroraExecutable), "Patches", Name);
             Directory.CreateDirectory(dir);
@@ -69,6 +71,7 @@ namespace AuroraPatch
             {
                 Formatting = Formatting.Indented
             };
+            serializer.Converters.Add(new StringEnumConverter());
 
             var file = Path.Combine(Path.GetDirectoryName(AuroraExecutable), "Patches", Name, id + ".json");
             if (!File.Exists(file))

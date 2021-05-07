@@ -10,7 +10,10 @@ namespace Lib
 {
     public enum AuroraType
     {
-        TacticalMapForm, EconomicsForm, GameState
+        TacticalMapForm, EconomicsForm, GameState, ClassDesignForm, CreateProjectForm, FleetWindowForm, 
+        MissileDesignForm, TurretDesignForm, GroundUnitDesignForm, CommandersWindowForm, MedalsForm, 
+        RaceWindowForm, SystemViewForm, GalacticMapForm, RaceComparisonForm, DiplomacyForm, TechnologyViewForm, 
+        MineralsForm, SectorsForm, EventsForm, GameDetailsForm
     }
 
     public class KnowledgeBase
@@ -29,6 +32,24 @@ namespace Lib
                 yield return new KeyValuePair<AuroraType, string>(AuroraType.TacticalMapForm, "jt");
                 yield return new KeyValuePair<AuroraType, string>(AuroraType.EconomicsForm, "gz");
                 yield return new KeyValuePair<AuroraType, string>(AuroraType.GameState, "aw");
+                yield return new KeyValuePair<AuroraType, string>(AuroraType.ClassDesignForm, "a8");
+                yield return new KeyValuePair<AuroraType, string>(AuroraType.CreateProjectForm, "a2");
+                yield return new KeyValuePair<AuroraType, string>(AuroraType.FleetWindowForm, "fs");
+                yield return new KeyValuePair<AuroraType, string>(AuroraType.MissileDesignForm, "g2");
+                yield return new KeyValuePair<AuroraType, string>(AuroraType.TurretDesignForm, "j2");
+                yield return new KeyValuePair<AuroraType, string>(AuroraType.GroundUnitDesignForm, "gg");
+                yield return new KeyValuePair<AuroraType, string>(AuroraType.CommandersWindowForm, "az");
+                yield return new KeyValuePair<AuroraType, string>(AuroraType.MedalsForm, "a4");
+                yield return new KeyValuePair<AuroraType, string>(AuroraType.RaceWindowForm, "hw");
+                yield return new KeyValuePair<AuroraType, string>(AuroraType.SystemViewForm, "js");
+                yield return new KeyValuePair<AuroraType, string>(AuroraType.GalacticMapForm, "a6");
+                yield return new KeyValuePair<AuroraType, string>(AuroraType.RaceComparisonForm, "hu");
+                yield return new KeyValuePair<AuroraType, string>(AuroraType.DiplomacyForm, "a0");
+                yield return new KeyValuePair<AuroraType, string>(AuroraType.TechnologyViewForm, "j1");
+                yield return new KeyValuePair<AuroraType, string>(AuroraType.MineralsForm, "g1");
+                yield return new KeyValuePair<AuroraType, string>(AuroraType.SectorsForm, "a5");
+                yield return new KeyValuePair<AuroraType, string>(AuroraType.EventsForm, "ff");
+                yield return new KeyValuePair<AuroraType, string>(AuroraType.GameDetailsForm, "i2");
             }
         }
 
