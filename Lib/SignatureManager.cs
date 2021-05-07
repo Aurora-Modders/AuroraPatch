@@ -147,7 +147,7 @@ namespace Lib
                 }
                 catch (Exception)
                 {
-                    Lib.Logger.LogInfo("Signatures not found.");
+                    Lib.LogInfo("Signatures not found.");
                 }
             }
         }

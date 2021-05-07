@@ -43,7 +43,7 @@ namespace Lib
                     NextUpdate = DateTime.UtcNow + TimeSpan.FromSeconds(30);
 
                     sw.Stop();
-                    Lib.Logger.LogInfo($"In-memory save took {sw.ElapsedMilliseconds} ms");
+                    Lib.LogInfo($"In-memory save took {sw.ElapsedMilliseconds} ms");
                 }
                 
                 using (var connection = new SQLiteConnection(Connection.ConnectionString))
@@ -137,7 +137,7 @@ namespace Lib
                 }
 
                 method.Invoke(game, new object[] { connection });
-                Lib.Logger.LogDebug($"Called function {function}");
+                Lib.LogDebug($"Called function {function}");
             }
 
             if (transaction != null)
@@ -155,7 +155,7 @@ namespace Lib
         {
             var commands = new List<string>();
 
-            Lib.Logger.LogInfo("Getting sql commands");
+            Lib.LogInfo("Getting sql commands");
             using (var connection = new SQLiteConnection("Data Source=AuroraDB.db;Version=3;New=False;Compress=True;"))
             {
                 connection.Open();
@@ -183,13 +183,13 @@ namespace Lib
                 connection.Close();
             }
 
-            Lib.Logger.LogInfo("Applying sql commands");
+            Lib.LogInfo("Applying sql commands");
             Connection = new SQLiteConnection("FullUri=file::memory:?cache=shared;");
             Connection.Open();
 
             foreach (var sql in commands)
             {
-                Lib.Logger.LogDebug($"executing sql: {sql}");
+                Lib.LogDebug($"executing sql: {sql}");
 
                 var command = Connection.CreateCommand();
                 command.CommandText = sql;

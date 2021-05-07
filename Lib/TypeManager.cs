@@ -24,11 +24,11 @@ namespace Lib
     public class TypeManager
     {
         private Assembly AuroraAssembly;
-        private Logger Logger;
+        private Lib Logger;
         private ConcurrentDictionary<AuroraFormType, Type> AuroraFormTypes = new ConcurrentDictionary<AuroraFormType, Type>();
         private BindingFlags DefaultBindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static;
 
-        public TypeManager(Assembly assembly, Logger logger)
+        public TypeManager(Assembly assembly, Lib logger)
         {
             AuroraAssembly = assembly;
             Logger = logger;

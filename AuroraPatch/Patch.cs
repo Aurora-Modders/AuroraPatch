@@ -15,7 +15,6 @@ namespace AuroraPatch
         public virtual string Description { get { return ""; } }
         public virtual IEnumerable<string> Dependencies { get { return Enumerable.Empty<string>(); } }
 
-        public Logger Logger => Program.Logger;
         public string AuroraExecutable => Loader.AuroraExecutable;
         public string AuroraChecksum => Loader.AuroraChecksum;
         public IEnumerable<Patch> LoadedPatches => Loader.LoadedPatches;
@@ -73,6 +72,31 @@ namespace AuroraPatch
             {
                 return serializer.Deserialize<T>(json);
             }
+        }
+
+        public void LogDebug(string message)
+        {
+            Program.Logger.LogDebug($"Patch {Name}: {message}");
+        }
+
+        public void LogInfo(string message)
+        {
+            Program.Logger.LogInfo($"Patch {Name}: {message}");
+        }
+
+        public void LogWarning(string message)
+        {
+            Program.Logger.LogWarning($"Patch {Name}: {message}");
+        }
+
+        public void LogError(string message)
+        {
+            Program.Logger.LogError($"Patch {Name}: {message}");
+        }
+
+        public void LogCritical(string message)
+        {
+            Program.Logger.LogCritical($"Patch {Name}: {message}");
         }
 
         /// <summary>

@@ -8,7 +8,7 @@ namespace AuroraPatch
     /// <summary>
     /// Enum representing various log levels.
     /// </summary>
-    public enum LogLevel
+    internal enum LogLevel
     {
         Debug = 0,
         Info = 1,
@@ -20,7 +20,7 @@ namespace AuroraPatch
     /// <summary>
     /// Logging wrapper so we can easily switch logging libraries/configuration in the future if necessary.
     /// </summary>
-    public class Logger
+    internal class Logger
     {
         private string Name;
         private LogLevel Level;

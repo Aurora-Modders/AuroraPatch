@@ -21,7 +21,7 @@ namespace ExamplePatch
 
         protected override void Load(Harmony harmony)
         {
-            Logger.LogInfo("Loading ExamplePatch...");
+            LogInfo("Loading ExamplePatch...");
 
             try
             {
@@ -29,7 +29,7 @@ namespace ExamplePatch
             }
             catch (Exception e)
             {
-                Logger.LogInfo("saved color not found");
+                LogInfo("saved color not found");
             }
 
             // get the exe and its checksum
