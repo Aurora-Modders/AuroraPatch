@@ -27,7 +27,16 @@ namespace AuroraPatch
         /// </summary>
         public object InvokeOnUIThread(Delegate method, params object[] args)
         {
-            return Loader.InvokeOnUIThread(method, args);
+            try
+            {
+                return TacticalMap.Invoke(method, args);
+            }
+            catch (Exception e)
+            {
+                LogError($"Invoke exception {e.Message}");
+
+                return null;
+            }
         }
 
         /// <summary>

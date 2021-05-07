@@ -17,13 +17,9 @@ namespace Lib
         public SignatureManager SignatureManager { get; private set; } = null;
         public DatabaseManager DatabaseManager { get; private set; } = null;
 
-        public Lib()
-        {
-            KnowledgeBase = new KnowledgeBase(this);
-        }
-
         protected override void Load(Harmony harmony)
         {
+            KnowledgeBase = new KnowledgeBase(this);
             SignatureManager = new SignatureManager(this);
         }
 

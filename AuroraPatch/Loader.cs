@@ -17,26 +17,10 @@ namespace AuroraPatch
         internal Assembly AuroraAssembly { get; set; } = null;
         internal Form TacticalMap { get; set; } = null;
 
-        private bool Started { get; set; } = false;
-
         internal Loader(string exe, string checksum)
         {
             AuroraExecutable = exe;
             AuroraChecksum = checksum;
-        }
-
-        internal object InvokeOnUIThread(Delegate method, params object[] args)
-        {
-            if (Started && TacticalMap.IsHandleCreated)
-            {
-                return TacticalMap.Invoke(method, args);
-            }
-            else
-            {
-                Program.Logger.LogError("Can not invoke on UI thread before the game is started");
-
-                return null;
-            }
         }
 
         internal List<Patch> FindPatches()
@@ -113,7 +97,6 @@ namespace AuroraPatch
         {
             TacticalMap = null;
             LoadedPatches.Clear();
-            Started = false;
 
             Program.Logger.LogInfo("Loading assembly " + AuroraExecutable + " with checksum " + AuroraChecksum);
             AuroraAssembly = Assembly.LoadFile(AuroraExecutable);
@@ -121,10 +104,17 @@ namespace AuroraPatch
             Program.Logger.LogInfo("Loading patches");
             foreach (var patch in patches)
             {
-                Program.Logger.LogInfo("Applying patch " + patch.Name);
+                Program.Logger.LogInfo("Loading patch " + patch.Name);
 
-                patch.LoadInternal();
-                LoadedPatches.Add(patch);
+                try
+                {
+                    patch.LoadInternal();
+                    LoadedPatches.Add(patch);
+                }
+                catch (Exception e)
+                {
+                    Program.Logger.LogError($"Patch exception {e.Message}");
+                }
             }
 
             Program.Logger.LogInfo("Starting Aurora");
@@ -140,11 +130,19 @@ namespace AuroraPatch
         /// <param name="e"></param>
         private void MapShown(object sender, EventArgs e)
         {
-            Started = true;
             Program.Logger.LogInfo("Starting patches");
             foreach (var patch in LoadedPatches)
             {
-                patch.StartInternal();
+                Program.Logger.LogInfo($"Starting patch {patch.Name}");
+
+                try
+                {
+                    patch.StartInternal();
+                }
+                catch (Exception ex)
+                {
+                    Program.Logger.LogError($"Patch exception {ex.Message}");
+                }
             }
         }
 
