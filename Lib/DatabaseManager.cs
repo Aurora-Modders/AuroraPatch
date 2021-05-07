@@ -63,12 +63,6 @@ namespace Lib
 
         private void Save()
         {
-            var functions = Lib.KnowledgeBase.GetSaveFunctions();
-            if (functions == null)
-            {
-                return;
-            }
-
             var map = Lib.TacticalMap;
             if (map == null)
             {
@@ -81,32 +75,16 @@ namespace Lib
                 return;
             }
 
+            var methods = Lib.KnowledgeBase.GetSaveMethods(game);
+            if (methods.Count == 0)
+            {
+                return;
+            }
+
             object connection = null;
             object transaction = null;
-            foreach (var function in functions.Split(','))
+            foreach (var method in methods)
             {
-                var method = game.GetType().GetMethods(AccessTools.all).Single(m =>
-                {
-                    if (m.Name != function)
-                    {
-                        return false;
-                    }
-
-                    var parameters = m.GetParameters();
-
-                    if (parameters.Length != 1)
-                    {
-                        return false;
-                    }
-
-                    if (parameters[0].ParameterType.Name != "SQLiteConnection")
-                    {
-                        return false;
-                    }
-
-                    return true;
-                });
-
                 if (connection == null)
                 {
                     var type = method.GetParameters()[0].ParameterType;
@@ -137,7 +115,7 @@ namespace Lib
                 }
 
                 method.Invoke(game, new object[] { connection });
-                Lib.LogDebug($"Called function {function}");
+                Lib.LogDebug($"Called function {method.Name}");
             }
 
             if (transaction != null)
