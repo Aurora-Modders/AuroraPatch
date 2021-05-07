@@ -28,8 +28,10 @@ namespace Lib
 
             foreach (var type in Lib.KnowledgeBase.GetKnownTypeNames())
             {
-                GenerateForType(type.Key, Lib.AuroraAssembly.GetType(type.Value));
+                GenerateSignatureFromType(type.Key, Lib.AuroraAssembly.GetType(type.Value));
             }
+
+            Save();
         }
 
         public Type Get(AuroraType name)
@@ -67,6 +69,8 @@ namespace Lib
                 {
                     signature.IsUniqueByChecksum.Add(Lib.AuroraChecksum, false);
                 }
+
+                Save();
             }
 
             if (signature.IsUniqueByChecksum[Lib.AuroraChecksum])
@@ -81,84 +85,6 @@ namespace Lib
             }
 
             return null;
-        }
-
-        public void GenerateForType(AuroraType name, Type type)
-        {
-            var fieldtypes = new Dictionary<Type, int>();
-
-            foreach (var field in type.GetFields(AccessTools.all))
-            {
-                if (field.FieldType.Assembly != Lib.AuroraAssembly 
-                    && field.FieldType.IsGenericType == false
-                    && field.FieldType.IsInterface == false)
-                {
-                    if (!fieldtypes.ContainsKey(field.FieldType))
-                    {
-                        fieldtypes.Add(field.FieldType, 0);
-                    }
-
-                    fieldtypes[field.FieldType]++;
-                }
-            }
-
-            var signature = new Signature()
-            {
-                Name = name,
-            };
-
-            foreach (var kvp in fieldtypes)
-            {
-                signature.MinFieldTypes.Add(kvp.Key.Name, kvp.Value - 5);
-                signature.MaxFieldTypes.Add(kvp.Key.Name, kvp.Value + 5);
-            }
-
-            var types = GetTypes(signature);
-            if (types.Count == 1)
-            {
-                signature.IsUniqueByChecksum.Add(Lib.AuroraChecksum, true);
-            }
-            else
-            {
-                signature.IsUniqueByChecksum.Add(Lib.AuroraChecksum, false);
-            }
-
-            lock (Signatures)
-            {
-                Signatures[name] = signature;
-            }
-
-            Save();
-        }
-
-        private void Load()
-        {
-            lock (Signatures)
-            {
-                Signatures.Clear();
-
-                try
-                {
-                    var signatures = Lib.Deserialize<List<Signature>>("signatures");
-                    foreach (var signature in signatures)
-                    {
-                        Signatures.Add(signature.Name, signature);
-                    }
-                }
-                catch (Exception)
-                {
-                    Lib.LogInfo("Signatures not found.");
-                }
-            }
-        }
-
-        private void Save()
-        {
-            lock (Signatures)
-            {
-                var signatures = Signatures.Values.ToList();
-                Lib.Serialize("signatures", signatures);
-            }
         }
 
         private List<Type> GetTypes(Signature signature)
@@ -211,6 +137,82 @@ namespace Lib
             }
 
             return types;
+        }
+
+        private void GenerateSignatureFromType(AuroraType name, Type type)
+        {
+            var fieldtypes = new Dictionary<Type, int>();
+
+            foreach (var field in type.GetFields(AccessTools.all))
+            {
+                if (field.FieldType.Assembly.FullName != Lib.AuroraAssembly.FullName 
+                    && field.FieldType.IsGenericType == false
+                    && field.FieldType.IsInterface == false)
+                {
+                    if (!fieldtypes.ContainsKey(field.FieldType))
+                    {
+                        fieldtypes.Add(field.FieldType, 0);
+                    }
+
+                    fieldtypes[field.FieldType]++;
+                }
+            }
+
+            var signature = new Signature()
+            {
+                Name = name,
+            };
+
+            foreach (var kvp in fieldtypes)
+            {
+                signature.MinFieldTypes.Add(kvp.Key.Name, kvp.Value - 5);
+                signature.MaxFieldTypes.Add(kvp.Key.Name, kvp.Value + 5);
+            }
+
+            var types = GetTypes(signature);
+            if (types.Count == 1)
+            {
+                signature.IsUniqueByChecksum.Add(Lib.AuroraChecksum, true);
+            }
+            else
+            {
+                signature.IsUniqueByChecksum.Add(Lib.AuroraChecksum, false);
+            }
+
+            lock (Signatures)
+            {
+                Signatures[name] = signature;
+            }
+        }
+
+        private void Load()
+        {
+            lock (Signatures)
+            {
+                Signatures.Clear();
+
+                try
+                {
+                    var signatures = Lib.Deserialize<List<Signature>>("signatures");
+                    foreach (var signature in signatures)
+                    {
+                        Signatures.Add(signature.Name, signature);
+                    }
+                }
+                catch (Exception)
+                {
+                    Lib.LogInfo("Signatures not found.");
+                }
+            }
+        }
+
+        private void Save()
+        {
+            lock (Signatures)
+            {
+                var signatures = Signatures.Values.ToList();
+                Lib.Serialize("signatures", signatures);
+            }
         }
     }
 }
