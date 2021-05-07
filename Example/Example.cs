@@ -65,8 +65,6 @@ namespace Example
 
         protected override void ChangeSettings()
         {
-            base.ChangeSettings();
-
             // pick TacticalMap background color
 
             var diag = new ColorDialog();
