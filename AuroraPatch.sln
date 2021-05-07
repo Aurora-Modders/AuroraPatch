@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.30021.99
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuroraPatch", "AuroraPatch\AuroraPatch.csproj", "{B1E5A9E8-57F7-45F0-920B-4FFA26EC0138}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExamplePatch", "ExamplePatch\ExamplePatch.csproj", "{678B78E2-A32A-4490-8D2E-18737A8532CF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Example", "ExamplePatch\Example.csproj", "{678B78E2-A32A-4490-8D2E-18737A8532CF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lib", "Lib\Lib.csproj", "{ACCE82BB-B894-4158-8167-C88A3AD5FCBE}"
 EndProject

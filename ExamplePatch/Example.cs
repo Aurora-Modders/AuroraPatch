@@ -12,7 +12,7 @@ using System.Data;
 
 namespace ExamplePatch
 {
-    public class ExamplePatch : AuroraPatch.Patch
+    public class Example : AuroraPatch.Patch
     {
         public static Color BackColor { get; set; } = Color.Black;
 
