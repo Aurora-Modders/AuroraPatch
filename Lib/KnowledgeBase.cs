@@ -34,18 +34,38 @@ namespace Lib
 
         public object GetGameState(Form map)
         {
-            switch (Lib.AuroraChecksum)
+            var type = Lib.SignatureManager.Get(AuroraType.GameState);
+            if (type == null)
             {
-                case "chm1c7": return map.GetType().GetField("a", AccessTools.all).GetValue(map);
-                default: return null;
+                return null;
             }
+
+            foreach (var field in map.GetType().GetFields(AccessTools.all))
+            {
+                if (field.FieldType.Name != type.Name)
+                {
+                    continue;
+                }
+
+                Lib.LogInfo($"GameState field {field.Name}");
+
+                return field.GetValue(map);
+            }
+
+            return null;
         }
 
-        public List<MethodInfo> GetSaveMethods(object game)
+        public List<MethodInfo> GetSaveMethods()
         {
             var methods = new List<MethodInfo>();
 
-            foreach (var method in game.GetType().GetMethods(AccessTools.all))
+            var type = Lib.SignatureManager.Get(AuroraType.GameState);
+            if (type == null)
+            {
+                return methods;
+            }
+
+            foreach (var method in type.GetMethods(AccessTools.all))
             {
                 var parameters = method.GetParameters();
 

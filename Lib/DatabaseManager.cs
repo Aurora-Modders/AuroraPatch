@@ -75,7 +75,7 @@ namespace Lib
                 return;
             }
 
-            var methods = Lib.KnowledgeBase.GetSaveMethods(game);
+            var methods = Lib.KnowledgeBase.GetSaveMethods();
             if (methods.Count == 0)
             {
                 return;
