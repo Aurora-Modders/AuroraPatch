@@ -163,21 +163,23 @@ namespace Lib
                 Name = name,
             };
 
-            foreach (var kvp in fieldtypes)
+            signature.IsUniqueByChecksum.Add(Lib.AuroraChecksum, false);
+            var deltas = new[] { 10, 5, 3, 2, 1 };
+            foreach (var delta in deltas)
             {
-                signature.MinFieldTypes.Add(kvp.Key.Name, kvp.Value - 5);
-                signature.MaxFieldTypes.Add(kvp.Key.Name, kvp.Value + 5);
-            }
+                foreach (var kvp in fieldtypes)
+                {
+                    signature.MinFieldTypes[kvp.Key.Name] = kvp.Value - delta;
+                    signature.MaxFieldTypes[kvp.Key.Name] = kvp.Value + delta;
+                }
 
-            var types = GetTypes(signature);
-            if (types.Count == 1)
-            {
-                signature.IsUniqueByChecksum.Add(Lib.AuroraChecksum, true);
-            }
-            else
-            {
-                signature.IsUniqueByChecksum.Add(Lib.AuroraChecksum, false);
-            }
+                var types = GetTypes(signature);
+                if (types.Count == 1)
+                {
+                    signature.IsUniqueByChecksum[Lib.AuroraChecksum] = true;
+                    break;
+                }
+            } 
 
             lock (Signatures)
             {
