@@ -144,6 +144,24 @@ namespace Lib
             switch (type)
             {
                 case AuroraType.EconomicsForm: return "cmdToolbarColony";
+                case AuroraType.ClassDesignForm: return "cmdToolbarClass";
+                case AuroraType.CreateProjectForm: return "cmdToolbarProject";
+                case AuroraType.FleetWindowForm: return "cmdToolbarFleet";
+                case AuroraType.MissileDesignForm: return "cmdToolbarMissileDesign";
+                case AuroraType.TurretDesignForm: return "cmdToolbarTurret";
+                case AuroraType.GroundUnitDesignForm: return "cmdToolbarGroundForces";
+                case AuroraType.CommandersWindowForm: return "cmdToolbarCommanders";
+                case AuroraType.MedalsForm: return "cmdToolbarMedals";
+                case AuroraType.RaceWindowForm: return "cmdToolbarRace";
+                case AuroraType.SystemViewForm: return "cmdToolbarSystem";
+                case AuroraType.GalacticMapForm: return "cmdToolbarGalactic";
+                case AuroraType.RaceComparisonForm: return "cmdToolbarComparison";
+                case AuroraType.DiplomacyForm: return "cmdToolbarIntelligence";
+                case AuroraType.TechnologyViewForm: return "cmdToolbarTechnology";
+                case AuroraType.MineralsForm: return "cmdToolbarSurvey";
+                case AuroraType.SectorsForm: return "cmdToolbarSector";
+                case AuroraType.EventsForm: return "cmdToolbarEvents";
+                case AuroraType.GameDetailsForm: return "cmdToolbarGame";
                 default: return null;
             }
         }
