@@ -65,8 +65,6 @@ jobs:
           
     #### When run manually, do a full release
     
-    - run: echo ${{ github.event_name }}
-    
     - name: Bump release version
       id: tag_version
       uses: mathieudutour/github-tag-action@v5.3
@@ -75,6 +73,7 @@ jobs:
         dry_run: true
     
     - name: Zip AuroraPatch
+      if: ${{ github.event_name == 'workflow_dispatch' }}
       uses: papeloto/action-zip@v1
       with:
         files: AuroraPatch/bin/Release/
@@ -82,11 +81,21 @@ jobs:
         dest: AuroraPatch-${{ steps.tag_version.outputs.new_version }}.zip
         
     - name: Create release
+      if: ${{ github.event_name == 'workflow_dispatch' }}
       uses: softprops/action-gh-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         prerelease: false
+        name: AuroraPatch ${{ steps.tag_version.outputs.new_tag }}
         tag_name: ${{ steps.tag_version.outputs.new_tag }}
         body: ${{ steps.tag_version.outputs.changelog }}
         files: AuroraPatch-${{ steps.tag_version.outputs.new_version }}.zip
+        
+    #### Delete tag & release
+    - uses: dev-drprasad/delete-tag-and-release@v0.2.0
+      with:
+        delete_release: true # default: false
+        tag_name: 0.0.4 # tag name to delete
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
