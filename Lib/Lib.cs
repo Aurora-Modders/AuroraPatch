@@ -43,7 +43,7 @@ namespace Lib
             }
         }
 
-        protected override void Start()
+        protected override void PostStart()
         {
             DatabaseManager = new DatabaseManager(this);
         }

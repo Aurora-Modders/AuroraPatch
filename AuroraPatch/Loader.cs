@@ -98,7 +98,7 @@ namespace AuroraPatch
             });
         }
 
-        internal IEnumerable<KeyValuePair<Patch, string>> GetUnmetDependencies(List<Patch> patches)
+        internal IEnumerable<KeyValuePair<Patch, string>> GetMissingDependencies(List<Patch> patches)
         {
             var available = new HashSet<string>();
             patches.ForEach(p => available.Add(p.Name));
@@ -123,10 +123,10 @@ namespace AuroraPatch
             Program.Logger.LogInfo("Loading Aurora " + AuroraExecutable + " with checksum " + AuroraChecksum);
             AuroraAssembly = Assembly.LoadFile(AuroraExecutable);
 
-            Program.Logger.LogInfo("Loading patches");
+            Program.Logger.LogInfo("Running Load");
             foreach (var patch in patches)
             {
-                Program.Logger.LogInfo("Loading patch " + patch.Name);
+                Program.Logger.LogInfo("Load patch " + patch.Name);
 
                 try
                 {
@@ -138,7 +138,23 @@ namespace AuroraPatch
                     Program.Logger.LogError($"Patch Load exception {e.Message}");
                 }
             }
-            Program.Logger.LogInfo("Done loading patches");
+            Program.Logger.LogInfo("Done running Load");
+
+            Program.Logger.LogInfo("Running PreStart");
+            foreach (var patch in patches)
+            {
+                Program.Logger.LogInfo("PreStart patch " + patch.Name);
+
+                try
+                {
+                    patch.PreStartInternal();
+                }
+                catch (Exception e)
+                {
+                    Program.Logger.LogError($"Patch PreStart exception {e.Message}");
+                }
+            }
+            Program.Logger.LogInfo("Done running PreStart");
 
             Program.Logger.LogInfo("Starting Aurora");
             TacticalMap = GetTacticalMap(AuroraAssembly);
@@ -153,21 +169,21 @@ namespace AuroraPatch
         /// <param name="e"></param>
         private void MapShown(object sender, EventArgs e)
         {
-            Program.Logger.LogInfo("Starting patches");
+            Program.Logger.LogInfo("Running PostStart");
             foreach (var patch in LoadedPatches)
             {
-                Program.Logger.LogInfo($"Starting patch {patch.Name}");
+                Program.Logger.LogInfo($"PostStart patch {patch.Name}");
 
                 try
                 {
-                    patch.StartInternal();
+                    patch.PostStartInternal();
                 }
                 catch (Exception ex)
                 {
-                    Program.Logger.LogError($"Patch Start exception {ex.Message}");
+                    Program.Logger.LogError($"Patch PostStart exception {ex.Message}");
                 }
             }
-            Program.Logger.LogInfo("Done starting patches");
+            Program.Logger.LogInfo("Done running PostStart");
         }
 
         /// <summary>

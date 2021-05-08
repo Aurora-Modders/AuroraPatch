@@ -13,18 +13,25 @@ namespace AuroraPatch
     public abstract class Patch
     {
         public string Name => GetType().Name;
+        public string AuroraExecutable => Loader.AuroraExecutable; // available on Load
+        public string AuroraChecksum => Loader.AuroraChecksum; // available on Load
+        public IEnumerable<Patch> LoadedPatches => Loader.LoadedPatches; // available on Load
+        public Assembly AuroraAssembly => Loader.AuroraAssembly; // available on Load
+        public Form TacticalMap => Loader.TacticalMap; // available on PostStart
+
+        /// <summary>
+        /// A description for your mod, shown on the AuroraPatch UI.
+        /// </summary>
         public virtual string Description { get { return ""; } }
+        /// <summary>
+        /// Return the names of other patches you depend on.
+        /// </summary>
         public virtual IEnumerable<string> Dependencies { get { return Enumerable.Empty<string>(); } }
 
-        public string AuroraExecutable => Loader.AuroraExecutable;
-        public string AuroraChecksum => Loader.AuroraChecksum;
-        public IEnumerable<Patch> LoadedPatches => Loader.LoadedPatches;
-        public Assembly AuroraAssembly => Loader.AuroraAssembly;
-        public Form TacticalMap => Loader.TacticalMap;
         internal Loader Loader { get; set; }
 
         /// <summary>
-        /// Run code on Aurora's UI thread. Only available after game start.
+        /// Run code on Aurora's UI thread. Only available on PostStart.
         /// </summary>
         public object InvokeOnUIThread(Delegate method, params object[] args)
         {
@@ -108,12 +115,11 @@ namespace AuroraPatch
 
         public void LogCritical(string message)
         {
-            Program.Logger.LogCritical($"Patch {Name}: {message}");
+            Program.Logger.LogCritical($"Patch {Name}: {message}", false);
         }
 
         /// <summary>
-        /// Called before the game is started. Use this to patch methods etc. 
-        /// TacticalMap will be null and you can not invoke code on Aurora's UI Thread.
+        /// Called after the Aurora assembly is loaded.
         /// </summary>
         /// <param name="aurora"></param>
         protected virtual void Load(Harmony harmony)
@@ -122,9 +128,18 @@ namespace AuroraPatch
         }
 
         /// <summary>
-        /// Called after game start. You can now invoke code on Aurora's UI thread and access the TacticalMap.
+        /// Called immediately before game start.
         /// </summary>
-        protected virtual void Start()
+        /// <param name="aurora"></param>
+        protected virtual void PreStart(Harmony harmony)
+        {
+
+        }
+
+        /// <summary>
+        /// Called immediately after game start. You can now invoke code on Aurora's UI thread and access the TacticalMap.
+        /// </summary>
+        protected virtual void PostStart()
         {
 
         }
@@ -142,9 +157,14 @@ namespace AuroraPatch
             Load(new Harmony(Name));
         }
 
-        internal void StartInternal()
+        internal void PreStartInternal()
         {
-            Start();
+            PreStart(new Harmony(Name));
+        }
+
+        internal void PostStartInternal()
+        {
+            PostStart();
         }
 
         internal void ChangeSettingsInternal()

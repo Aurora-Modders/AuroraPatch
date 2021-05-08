@@ -125,7 +125,7 @@ namespace Automation
             Lib = (Lib.Lib)LoadedPatches.Single(p => p.Name == "Lib");
         }
 
-        protected override void Start()
+        protected override void PostStart()
         {
             foreach (var button in Lib.KnowledgeBase.GetTimeIncrementButtons())
             {

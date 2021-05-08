@@ -24,7 +24,7 @@ namespace AuroraPatch
 
         private void ButtonStart_Click(object sender, EventArgs e)
         {
-            foreach (var missing in Loader.GetUnmetDependencies(Patches))
+            foreach (var missing in Loader.GetMissingDependencies(Patches))
             {
                 MessageBox.Show($"Patch {missing.Key.Name} missing dependency {missing.Value}");
                 

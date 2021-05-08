@@ -46,7 +46,7 @@ namespace Example
             harmony.Patch(ctor, null, method);
         }
 
-        protected override void Start()
+        protected override void PostStart()
         {
             var message = "Example patch loaded!\n";
 
