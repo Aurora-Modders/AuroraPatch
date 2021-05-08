@@ -69,6 +69,9 @@ jobs:
           
     #### When run manually, do a full release
     
+    - name: Set release type
+      run: echo "RELEASE_TAG=dev-11" >> $GITHUB_ENV
+    
     - name: Bump release version
       id: tag_version
       uses: mathieudutour/github-tag-action@v5.3
@@ -96,11 +99,3 @@ jobs:
         tag_name: ${{ steps.tag_version.outputs.new_tag }}
         body: ${{ steps.tag_version.outputs.changelog }}
         files: AuroraPatch-${{ steps.tag_version.outputs.new_version }}.zip
-        
-    #### Delete tag & release
-    - uses: dev-drprasad/delete-tag-and-release@v0.2.0
-      with:
-        delete_release: true # default: false
-        tag_name: 0.0.4 # tag name to delete
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
