@@ -49,12 +49,12 @@ jobs:
         
     - name: Create release
       uses: marvinpinto/action-automatic-releases@latest
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          automatic_release_tag: 'latest-dev'
-          prerelease: true
-          title: 'Latest Development Build ${{ github.run_number }}'
-          files: |
-            AuroraPatch-dev-${{ github.run_number }}.zip
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        automatic_release_tag: 'latest-dev'
+        prerelease: true
+        title: 'Latest Development Build ${{ github.run_number }}'
+        files: |
+          AuroraPatch-dev-${{ github.run_number }}.zip
             
           
