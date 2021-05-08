@@ -43,6 +43,18 @@ jobs:
     - name: Zip AuroraPatch
       uses: papeloto/action-zip@v1
       with:
-        files: AuroraPatch
+        files: AuroraPatch/
         recursive: true
-        dest: result.zip
+        dest: AuroraPatch.zip
+        
+    - name: Create release
+      uses: marvinpinto/action-automatic-releases@latest
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          automatic_release_tag: 'latest-dev'
+          prerelease: true
+          title: 'Latest Development Build ${{ github.run_number }}'
+          files: |
+            AuroraPatch-dev-${{ github.run_number }}.zip
+            
+          
