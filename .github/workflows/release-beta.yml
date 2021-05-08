@@ -1,8 +1,11 @@
 name: Release Beta
 
 on:
+
   push:
+  
     branches:
+    
     - main
         
 jobs:
