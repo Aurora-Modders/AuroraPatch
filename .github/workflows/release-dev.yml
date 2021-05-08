@@ -6,13 +6,13 @@ on:
   
     branches:
     
-    - main
+    - master
 
   push:
   
     branches:
     
-    - main
+    - master
         
 jobs:
 
@@ -43,5 +43,5 @@ jobs:
     - name: Zip AuroraPatch
       uses: papeloto/action-zip@v1
       with:
-        files: AuroraPatch/bin/Release/
+        files: AuroraPatch\bin\Release\
         dest: result.zip
