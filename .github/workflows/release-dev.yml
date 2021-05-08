@@ -35,6 +35,9 @@ jobs:
     - name: Execute unit tests
       run: dotnet test
               
+    - name: Restore AuroraPatch
+      run: msbuild AuroraPatch /t:Restore /p:Configuration=Release
+    
     - name: Build AuroraPatch
       run: msbuild AuroraPatch /p:Configuration=Release
       
