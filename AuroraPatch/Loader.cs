@@ -44,9 +44,9 @@ namespace AuroraPatch
 
                         Program.Logger.LogInfo($"Found asembly {Path.GetFileName(dll)}");
                     }
-                    catch (Exception)
+                    catch (Exception e)
                     {
-                        Program.Logger.LogDebug($"File {dll} can not be loaded as Assembly.");
+                        Program.Logger.LogError($"File {dll} can not be loaded as Assembly: {e}");
                     }
                 }
             }
