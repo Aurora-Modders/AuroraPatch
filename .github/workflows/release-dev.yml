@@ -63,7 +63,7 @@ jobs:
     #  run: mkdir AuroraPatch/bin/Release/Patches/Lib
       
     - name: Include Lib in AuroraPatch
-      run: xcopy Lib/bin/Release AuroraPatch/bin/Release/Patches/Lib/ /E
+      run: xcopy Lib\bin\Release AuroraPatch\bin\Release\Patches\Lib\ /E
       
     - name: Zip AuroraPatch
       uses: papeloto/action-zip@v1
