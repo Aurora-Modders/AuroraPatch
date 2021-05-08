@@ -44,7 +44,7 @@ jobs:
       run: cd $GITHUB_WORKSPACE
                   
     - name: Restore AuroraPatch
-      run: nuget restore AuroraPatch
+      run: nuget restore AuroraPatch.sln
     
     #- name: Build AuroraPatch
     #  run: msbuild AuroraPatch /p:Configuration=Release
