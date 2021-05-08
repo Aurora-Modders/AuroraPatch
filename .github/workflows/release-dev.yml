@@ -1,0 +1,60 @@
+name: Release dev
+
+on:
+
+  workflow_dispatch:
+  
+    branches:
+    
+    - master
+
+  push:
+  
+    branches:
+    
+    - master
+        
+jobs:
+
+  release:
+  
+    runs-on: windows-latest
+        
+    steps:
+    
+    - uses: actions/checkout@v2
+            
+    - name: Install .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+            
+    - name: Setup MSBuild.exe
+      uses: microsoft/setup-msbuild@v1.0.2
+              
+    - name: Execute unit tests
+      run: dotnet test
+              
+    - name: Build AuroraPatch
+      run: msbuild AuroraPatch /t:Restore /p:Configuration=Release
+      
+    - run: dir
+      
+    - name: Zip AuroraPatch
+      uses: papeloto/action-zip@v1
+      with:
+        files: AuroraPatch/
+        recursive: true
+        dest: AuroraPatch.zip
+        
+    - name: Create release
+      uses: marvinpinto/action-automatic-releases@latest
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        automatic_release_tag: 'latest-dev'
+        prerelease: true
+        title: 'Latest Development Build ${{ github.run_number }}'
+        files: |
+          AuroraPatch-dev-${{ github.run_number }}.zip
+            
+          
