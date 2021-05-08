@@ -41,12 +41,15 @@ jobs:
     - name: Build Lib
       run: msbuild Lib /p:Configuration=Release
       
+    - name: Include Lib in AuroraPatch
+      run: xcopy Lib\bin\Release AuroraPatch\bin\Release\Patches\Lib\ /E
+      
     - name: Delete previous dev release
       if: ${{ github.event_name != 'workflow_dispatch' }}
       uses: dev-drprasad/delete-tag-and-release@v0.2.0
       with:
         delete_release: true # default: false
-        tag_name: dev-latest # tag name to delete
+        tag_name: vdev-latest # tag name to delete
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
@@ -61,10 +64,7 @@ jobs:
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         custom_tag: ${{ steps.release_type.outputs.version }}
-        
-    - name: Include Lib in AuroraPatch
-      run: xcopy Lib\bin\Release AuroraPatch\bin\Release\Patches\Lib\ /E
-    
+
     - name: Zip AuroraPatch
       uses: papeloto/action-zip@v1
       with:
