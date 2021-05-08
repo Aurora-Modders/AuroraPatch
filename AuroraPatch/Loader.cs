@@ -39,7 +39,7 @@ namespace AuroraPatch
                 {
                     try
                     {
-                        var assembly = Assembly.LoadFrom(dll);
+                        var assembly = Assembly.UnsafeLoadFrom(dll);
                         assemblies.Add(assembly);
 
                         Program.Logger.LogInfo($"Found asembly {Path.GetFileName(dll)}");
