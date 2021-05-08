@@ -70,6 +70,7 @@ jobs:
       uses: mathieudutour/github-tag-action@v5.3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
+        dry_run: true
     
     - name: Zip AuroraPatch
       uses: papeloto/action-zip@v1
@@ -82,6 +83,7 @@ jobs:
       uses: marvinpinto/action-automatic-releases@latest
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
+        automatic_release_tag: '${{ steps.tag_version.outputs.new_version }}'
         prerelease: false
         title: 'AuroraPatch ${{ steps.tag_version.outputs.new_version }}'
         files: AuroraPatch-${{ steps.tag_version.outputs.new_version }}.zip
