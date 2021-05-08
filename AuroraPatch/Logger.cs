@@ -30,10 +30,8 @@ namespace AuroraPatch
             Level = level;
             Stream logStream = File.Create(logFile);
             TextWriterTraceListener traceListener = new TextWriterTraceListener(logStream, "AuroraPatch");
-            Debug.Listeners.Add(traceListener);
             Trace.Listeners.Add(traceListener);
             Trace.AutoFlush = true;
-            Debug.AutoFlush = true;
             LogInfo("AuroraPatch logger initialized");
         }
 
