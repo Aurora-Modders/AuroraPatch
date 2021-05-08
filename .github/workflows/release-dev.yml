@@ -33,10 +33,10 @@ jobs:
     #  run: dotnet test
     
     - name: Setup MSBuild.exe
-      uses: microsoft/setup-msbuild@v1.0.2
+      uses: microsoft/setup-msbuild@latest
       
-    - name: Setup NuGet
-      uses: NuGet/setup-nuget@v1.0.2
+    #- name: Setup NuGet
+    #  uses: NuGet/setup-nuget@latest
       
     - name: Navigate to Workspace
       run: cd $GITHUB_WORKSPACE
