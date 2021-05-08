@@ -3,6 +3,10 @@ name: Release dev
 on:
 
   workflow_dispatch:
+  
+    branches:
+    
+    - main
 
   push:
   
@@ -35,7 +39,7 @@ jobs:
       run: msbuild AuroraPatch /t:Restore /p:Configuration=Release
       
     - name: Zip AuroraPatch
-      uses: thedoctor0/zip-release@master
+      uses: papeloto/action-zip@v1
       with:
-        filename: 'release.zip'
-        exclusions: '*.git* /*node_modules/* .editorconfig'
+        files: /
+        dest: result.zip
