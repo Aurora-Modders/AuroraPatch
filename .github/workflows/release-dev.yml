@@ -45,7 +45,7 @@ jobs:
       with:
         files: AuroraPatch/
         recursive: true
-        dest: AuroraPatch.zip
+        dest: AuroraPatch-dev-${{ github.run_number }}.zip
         
     - name: Create release
       uses: marvinpinto/action-automatic-releases@latest
