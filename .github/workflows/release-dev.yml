@@ -43,5 +43,6 @@ jobs:
     - name: Zip AuroraPatch
       uses: papeloto/action-zip@v1
       with:
-        files: AuroraPatch/
+        files: AuroraPatch
+        recursive: true
         dest: result.zip
