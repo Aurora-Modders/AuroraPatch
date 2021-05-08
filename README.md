@@ -4,7 +4,7 @@ This allows patching of the Aurora executable, it supports Harmony. The patcher 
 
 ## For users
 
-Extract AuroraPatch.zip in Aurora's folder. Patches go into their own `\Patches\{name}\` subfolder where `name` is the name of the patch. Start the game by running AuroraPatch.exe.
+Grab the latest zip from the [releases page](https://github.com/Aurora-Modders/AuroraPatch/releases). Extract AuroraPatch.zip in Aurora's folder. Patches go into their own `\Patches\{name}\` subfolder where `name` is the name of the patch. Start the game by running AuroraPatch.exe.
 
 ## For patch creators
 
