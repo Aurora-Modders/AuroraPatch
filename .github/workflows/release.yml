@@ -82,10 +82,11 @@ jobs:
         dest: AuroraPatch-${{ steps.tag_version.outputs.new_version }}.zip
         
     - name: Create release
-      uses: marvinpinto/action-automatic-releases@latest
+      uses: softprops/action-gh-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        automatic_release_tag: '${{ steps.tag_version.outputs.new_tag }}'
         prerelease: false
-        title: 'AuroraPatch ${{ steps.tag_version.outputs.new_tag }}'
+        tag_name: ${{ steps.tag_version.outputs.new_tag }}
+        body: ${{ steps.tag_version.outputs.changelog }}
         files: AuroraPatch-${{ steps.tag_version.outputs.new_version }}.zip
