@@ -52,7 +52,6 @@ jobs:
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         custom_tag: ${{ steps.release_type.outputs.version }}
-        dry_run: true
         
     - name: Include Lib in AuroraPatch
       run: xcopy Lib\bin\Release AuroraPatch\bin\Release\Patches\Lib\ /E
