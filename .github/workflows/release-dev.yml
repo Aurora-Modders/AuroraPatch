@@ -46,15 +46,15 @@ jobs:
     - name: Restore AuroraPatch
       run: nuget restore AuroraPatch.sln
     
-    #- name: Build AuroraPatch
-    #  run: msbuild AuroraPatch /p:Configuration=Release
+    - name: Build AuroraPatch
+      run: msbuild AuroraPatch /p:Configuration=Release
       
     - run: dir
       
     - name: Zip AuroraPatch
       uses: papeloto/action-zip@v1
       with:
-        files: AuroraPatch/
+        files: AuroraPatch/bin/Release/
         recursive: true
         dest: AuroraPatch-dev-${{ github.run_number }}.zip
         
