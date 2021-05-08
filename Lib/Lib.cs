@@ -18,6 +18,8 @@ namespace Lib
         public DatabaseManager DatabaseManager { get; private set; } = null;
 
         private static readonly HashSet<Form> OpenForms = new HashSet<Form>();
+        private static readonly Dictionary<AuroraType, List<Tuple<string, MethodInfo, string>>> EventHandlers = new Dictionary<AuroraType, List<Tuple<string, MethodInfo, string>>>();
+        private static volatile bool CanRegisterEventHandlers = true;
 
         public List<Form> GetOpenForms()
         {
@@ -28,6 +30,24 @@ namespace Lib
             }
 
             return forms;
+        }
+
+        public void RegisterEventHandler(AuroraType form, string event_name, MethodInfo handler, string control_name = "")
+        {
+            if (!CanRegisterEventHandlers)
+            {
+                return;
+            }
+
+            lock (EventHandlers)
+            {
+                if (!EventHandlers.ContainsKey(form))
+                {
+                    EventHandlers.Add(form, new List<Tuple<string, MethodInfo, string>>());
+                }
+
+                EventHandlers[form].Add(new Tuple<string, MethodInfo, string>(event_name, handler, control_name));
+            }
         }
 
         protected override void Load(Harmony harmony)
@@ -41,6 +61,13 @@ namespace Lib
                 var method = new HarmonyMethod(GetType().GetMethod("PostfixFormConstructor", AccessTools.all));
                 harmony.Patch(ctor, null, method);
             }
+        }
+
+        protected override void PreStart(Harmony harmony)
+        {
+            CanRegisterEventHandlers = false;
+
+
         }
 
         protected override void PostStart()

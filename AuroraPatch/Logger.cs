@@ -31,13 +31,15 @@ namespace AuroraPatch
             Stream logStream = File.Create(logFile);
             TextWriterTraceListener traceListener = new TextWriterTraceListener(logStream, "AuroraPatch");
             Debug.Listeners.Add(traceListener);
+            Trace.Listeners.Add(traceListener);
+            Trace.AutoFlush = true;
             Debug.AutoFlush = true;
             LogInfo("AuroraPatch logger initialized");
         }
 
         private void Log(string message, LogLevel level, bool popup = false)
         {
-            Debug.WriteLine(
+            Trace.WriteLine(
                 string.Format("{0} - {1} - {2}: {3}",
                     DateTime.Now,
                     Name,
