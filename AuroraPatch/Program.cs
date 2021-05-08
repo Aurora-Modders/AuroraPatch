@@ -35,6 +35,8 @@ namespace AuroraPatch
                 return;
             }
 
+            Logger.LogInfo($"Found Aurora at {exe}");
+
             var checksum = GetChecksum(File.ReadAllBytes(exe));
             var loader = new Loader(exe, checksum);
 

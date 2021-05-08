@@ -71,7 +71,7 @@ namespace AuroraPatch
             if (Level <= LogLevel.Warning) Log(message, LogLevel.Warning, popup);
         }
 
-        public void LogError(string message, bool popup = true)
+        public void LogError(string message, bool popup = false)
         {
             if (Level <= LogLevel.Error) Log(message, LogLevel.Error, popup);
         }

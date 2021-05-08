@@ -39,8 +39,22 @@ namespace Automation
             return (T)IterateControls(parent).Single(c => c.Name == name);
         }
 
-        public bool TryOpenFormInstance(AuroraType type)
+        public bool OpenFormInstance(AuroraType type)
         {
+            var formtype = Lib.SignatureManager.Get(type);
+            if (formtype == null)
+            {
+                return false;
+            }
+
+            foreach (var open in Lib.GetOpenForms())
+            {
+                if (open.GetType().Name == formtype.Name)
+                {
+                    return true;
+                }
+            }
+
             if (TacticalMap == null)
             {
                 return false;
@@ -52,15 +66,9 @@ namespace Automation
                 return false;
             }
 
-            var formtype = Lib.SignatureManager.Get(type);
-            if (formtype == null)
-            {
-                return false;
-            }
-
-            var button = GetControlByName<Button>(TacticalMap, name);
             var action = new Action(() =>
             {
+                var button = GetControlByName<Button>(TacticalMap, name);
                 TacticalMap.Activate();
                 button.PerformClick();
             });
@@ -71,7 +79,7 @@ namespace Automation
 
         public void RunOnForm(AuroraType type, Action<Form> action)
         {
-            if (!TryOpenFormInstance(type))
+            if (!OpenFormInstance(type))
             {
                 LogWarning($"Could not open form {type}");
 
@@ -103,7 +111,11 @@ namespace Automation
                     return;
                 }
 
-                InvokeOnUIThread(action, new[] { form });
+                InvokeOnUIThread(new Action(() =>
+                {
+                    form.Activate();
+                    action(form);
+                }));
             });
             t.Start();
         }
@@ -130,6 +142,17 @@ namespace Automation
             {
                 LogControlsInfo(form);
 
+                var poptree = GetControlByName<TreeView>(form, "tvPopList");
+                foreach (TreeNode system in poptree.Nodes)
+                {
+                    LogInfo($"System {system.Text}");
+
+                    foreach (TreeNode pop in system.Nodes)
+                    {
+                        LogInfo($"Pop {pop.Text}");
+                    }
+                }
+
                 var tabcontrol = GetControlByName<TabControl>(form, "tabPopulation");
                 var industrytab = GetControlByName<TabPage>(form, "tabIndustry");
                 tabcontrol.SelectedTab = industrytab;
@@ -143,10 +166,18 @@ namespace Automation
                     }
                 }
 
-                var projects = GetControlByName<ListView>(form, "lstvConstruction");
-                foreach (var item in projects.Items)
+                var projects = GetControlByName<ListBox>(form, "lstPI");
+                LogInfo($"Listbox display member {projects.DisplayMember}");
+
+                foreach (var item in projects.Items.OfType<object>().ToList())
                 {
-                    LogInfo($"List item {item}");
+                    var displayed = item.GetType().GetProperty(projects.DisplayMember).GetValue(item, null).ToString();
+                    LogInfo($"Listbox item {displayed}");
+
+                    if (displayed == "Diplomacy Module")
+                    {
+                        projects.SelectedItem = item;
+                    }
                 }
             });
         }

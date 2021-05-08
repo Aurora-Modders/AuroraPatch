@@ -29,10 +29,12 @@ namespace AuroraPatch
             string patchesDirectory = Path.Combine(Path.GetDirectoryName(AuroraExecutable), "Patches");
             Directory.CreateDirectory(patchesDirectory);
 
+            Program.Logger.LogInfo($"Loading patches from {patchesDirectory}");
+
             var assemblies = new List<Assembly>();
             foreach (var dir in Directory.EnumerateDirectories(patchesDirectory))
             {
-                Program.Logger.LogInfo($"Looking for dll's in {dir}");
+                Program.Logger.LogInfo($"Looking for assemblies in {dir}");
                 foreach (var dll in Directory.EnumerateFiles(dir, "*.dll"))
                 {
                     try
@@ -51,15 +53,24 @@ namespace AuroraPatch
 
             foreach (var assembly in assemblies)
             {
-                foreach (var type in assembly.GetTypes())
+                Program.Logger.LogInfo($"Trying to retrieve types from assembly {Path.GetFileName(assembly.Location)}");
+
+                try
                 {
-                    if (typeof(Patch).IsAssignableFrom(type))
+                    foreach (var type in assembly.GetTypes())
                     {
-                        Program.Logger.LogInfo($"Found patch {type.Name}");
-                        var patch = (Patch)Activator.CreateInstance(type);
-                        patch.Loader = this;
-                        patches.Add(patch);
+                        if (typeof(Patch).IsAssignableFrom(type))
+                        {
+                            Program.Logger.LogInfo($"Found patch {type.Name}");
+                            var patch = (Patch)Activator.CreateInstance(type);
+                            patch.Loader = this;
+                            patches.Add(patch);
+                        }
                     }
+                }
+                catch (ReflectionTypeLoadException e)
+                {
+                    Program.Logger.LogError(e.LoaderExceptions.First().Message + " Are you missing a dependency?", false);
                 }
             }
 
@@ -109,7 +120,7 @@ namespace AuroraPatch
             TacticalMap = null;
             LoadedPatches.Clear();
 
-            Program.Logger.LogInfo("Loading assembly " + AuroraExecutable + " with checksum " + AuroraChecksum);
+            Program.Logger.LogInfo("Loading Aurora " + AuroraExecutable + " with checksum " + AuroraChecksum);
             AuroraAssembly = Assembly.LoadFile(AuroraExecutable);
 
             Program.Logger.LogInfo("Loading patches");
@@ -124,9 +135,10 @@ namespace AuroraPatch
                 }
                 catch (Exception e)
                 {
-                    Program.Logger.LogError($"Patch exception {e.Message}");
+                    Program.Logger.LogError($"Patch Load exception {e.Message}");
                 }
             }
+            Program.Logger.LogInfo("Done loading patches");
 
             Program.Logger.LogInfo("Starting Aurora");
             TacticalMap = GetTacticalMap(AuroraAssembly);
@@ -152,9 +164,10 @@ namespace AuroraPatch
                 }
                 catch (Exception ex)
                 {
-                    Program.Logger.LogError($"Patch exception {ex.Message}");
+                    Program.Logger.LogError($"Patch Start exception {ex.Message}");
                 }
             }
+            Program.Logger.LogInfo("Done starting patches");
         }
 
         /// <summary>
