@@ -59,6 +59,12 @@ jobs:
     - name: Build AuroraPatch
       run: msbuild AuroraPatch /p:Configuration=Release
       
+    #- name: Create folder for Lib
+    #  run: mkdir AuroraPatch/bin/Release/Patches/Lib
+      
+    - name: Include Lib in AuroraPatch
+      run: xcopy Lib/bin/Release AuroraPatch/bin/Release/Patches/Lib/ /E
+      
     - name: Zip AuroraPatch
       uses: papeloto/action-zip@v1
       with:
