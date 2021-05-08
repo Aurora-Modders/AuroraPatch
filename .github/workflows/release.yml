@@ -1,4 +1,4 @@
-name: Release dev
+name: Release
 
 on:
 
@@ -23,14 +23,6 @@ jobs:
     steps:
     
     - uses: actions/checkout@v2
-            
-    #- name: Install .NET Core
-    #  uses: actions/setup-dotnet@v1
-    #  with:
-    #    dotnet-version: 5.0.x
-    
-    #- name: Execute unit tests
-    #  run: dotnet test
     
     - name: Setup MSBuild.exe
       uses: microsoft/setup-msbuild@v1.0.2
@@ -62,21 +54,37 @@ jobs:
         recursive: true
         dest: AuroraPatch-dev-${{ github.run_number }}.zip
         
-    #- name: Zip Lib
-    #  uses: papeloto/action-zip@v1
-    #  with:
-    #    files: Lib/bin/Release/
-    #    recursive: true
-    #    dest: Lib-dev-${{ github.run_number }}.zip
-        
-    - name: Create release
+    - name: Create dev release
       uses: marvinpinto/action-automatic-releases@latest
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         automatic_release_tag: 'latest-dev'
         prerelease: true
         title: 'Latest Development Build ${{ github.run_number }}'
-        files: |
-          AuroraPatch-dev-${{ github.run_number }}.zip
-        #  Lib-dev-${{ github.run_number }}.zip
+        files: AuroraPatch-dev-${{ github.run_number }}.zip
           
+    #### When run manually, do a full release
+    
+    - name: Bump release version
+      id: tag_version
+      uses: mathieudutour/github-tag-action@v5.3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        
+    - run: echo ${{ steps.tag_version.outputs.new_version }}
+    
+    - name: Zip AuroraPatch
+      uses: papeloto/action-zip@v1
+      with:
+        files: AuroraPatch/bin/Release/
+        recursive: true
+        dest: AuroraPatch-${{ steps.tag_version.outputs.new_version }}.zip
+        
+    - name: Create release
+      uses: marvinpinto/action-automatic-releases@latest
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        automatic_release_tag: 'latest'
+        prerelease: false
+        title: 'AuroraPatch ${{ steps.tag_version.outputs.new_version }}'
+        files: AuroraPatch-${{ steps.tag_version.outputs.new_version }}.zip
