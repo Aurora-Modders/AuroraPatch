@@ -44,7 +44,7 @@ jobs:
     - name: Set dev release
       if: ${{ github.event_name != 'workflow_dispatch' }}
       id: release_type
-      run: echo "::set-output name=version::dev-${{ github.run_number }}"
+      run: echo "::set-output name=version::dev-latest"
     
     - name: Bump release version
       id: tag_version
