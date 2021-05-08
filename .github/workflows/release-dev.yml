@@ -43,13 +43,21 @@ jobs:
     - name: Navigate to Workspace
       run: cd $GITHUB_WORKSPACE
                   
-    - name: Restore AuroraPatch
+    - name: Restore Packages
       run: nuget restore AuroraPatch.sln
+      
+    - name: Build Lib
+      run: msbuild Lib /p:Configuration=Release
+      
+    - name: Zip Lib
+      uses: papeloto/action-zip@v1
+      with:
+        files: Lib/bin/Release/
+        recursive: true
+        dest: Lib-dev-${{ github.run_number }}.zip
     
     - name: Build AuroraPatch
       run: msbuild AuroraPatch /p:Configuration=Release
-      
-    - run: dir
       
     - name: Zip AuroraPatch
       uses: papeloto/action-zip@v1
@@ -67,5 +75,5 @@ jobs:
         title: 'Latest Development Build ${{ github.run_number }}'
         files: |
           AuroraPatch-dev-${{ github.run_number }}.zip
-            
+          Lib-dev-${{ github.run_number }}.zip
           
