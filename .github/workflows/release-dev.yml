@@ -28,13 +28,19 @@ jobs:
     #  uses: actions/setup-dotnet@v1
     #  with:
     #    dotnet-version: 5.0.x
-            
-    - name: Setup MSBuild.exe
-      uses: microsoft/setup-msbuild@v1.0.2
-              
+    
     #- name: Execute unit tests
     #  run: dotnet test
-              
+    
+    - name: Setup MSBuild.exe
+      uses: microsoft/setup-msbuild@v1.0.2
+      
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v1.0.2
+      
+    - name: Navigate to Workspace
+      run: cd $GITHUB_WORKSPACE
+                  
     - name: Restore AuroraPatch
       run: msbuild AuroraPatch /t:Restore /p:Configuration=Release
     
