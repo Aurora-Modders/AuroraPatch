@@ -19,7 +19,8 @@ namespace Lib
         public DatabaseManager DatabaseManager { get; private set; } = null; // available on PostStart
 
         private static readonly HashSet<Form> OpenForms = new HashSet<Form>();
-        private static readonly Dictionary<Type, List<Tuple<string, MethodInfo, string>>> EventHandlers = new Dictionary<Type, List<Tuple<string, MethodInfo, string>>>();
+        private static readonly Dictionary<Type, List<Tuple<string, MethodInfo, Func<Control, bool>>>> EventHandlers = new Dictionary<Type, List<Tuple<string, MethodInfo, Func<Control, bool>>>>();
+        private static Lib Instance { get; set; } = null;
 
         public List<Form> GetOpenForms()
         {
@@ -32,7 +33,7 @@ namespace Lib
             return forms;
         }
 
-        public void RegisterEventHandler(AuroraType form, string event_name, MethodInfo handler, string control_name = null)
+        public void RegisterEventHandler(AuroraType form, string event_name, MethodInfo handler, Func<Control, bool> predicate = null)
         {
             lock (EventHandlers)
             {
@@ -40,15 +41,16 @@ namespace Lib
 
                 if (!EventHandlers.ContainsKey(type))
                 {
-                    EventHandlers.Add(type, new List<Tuple<string, MethodInfo, string>>());
+                    EventHandlers.Add(type, new List<Tuple<string, MethodInfo, Func<Control, bool>>>());
                 }
 
-                EventHandlers[type].Add(new Tuple<string, MethodInfo, string>(event_name, handler, control_name));
+                EventHandlers[type].Add(new Tuple<string, MethodInfo, Func<Control, bool>>(event_name, handler, predicate));
             }
         }
 
         protected override void Loaded(Harmony harmony)
         {
+            Instance = this;
             KnowledgeBase = new KnowledgeBase(this);
             SignatureManager = new SignatureManager(this);
             UIManager = new UIManager(this);
@@ -59,6 +61,8 @@ namespace Lib
                 var method = new HarmonyMethod(GetType().GetMethod("PostfixFormConstructor", AccessTools.all));
                 harmony.Patch(ctor, null, method);
             }
+
+            
         }
 
         protected override void Started()
@@ -70,22 +74,59 @@ namespace Lib
         {
             __instance.Shown += OnFormShown;
             __instance.FormClosing += OnFormFormClosing;
+
+            lock (EventHandlers)
+            {
+                var key = EventHandlers.Keys.FirstOrDefault(t => t.Name == __instance.GetType().Name);
+                if (key == null)
+                {
+                    return;
+                }
+
+                var controls = Instance.UIManager.IterateControls(__instance).ToList();
+
+                foreach (var handler in EventHandlers[key])
+                {
+                    if (handler.Item3 == null)
+                    {
+                        // on form itself
+                        AddEventHandler(__instance, handler.Item1, handler.Item2);
+                    }
+                    else
+                    {
+                        // on controls on the form
+                        foreach (var control in controls.Where(c => handler.Item3(c)))
+                        {
+                            AddEventHandler(control, handler.Item1, handler.Item2);
+                        }
+                    }
+                }
+            }
         }
 
         private static void OnFormShown(object sender, EventArgs e)
         {
+            var form = (Form)sender;
             lock (OpenForms)
             {
-                OpenForms.Add((Form)sender);
+                OpenForms.Add(form);
             }
         }
 
         private static void OnFormFormClosing(object sender, EventArgs e)
         {
+            var form = (Form)sender;
             lock (OpenForms)
             {
-                OpenForms.Remove((Form)sender);
+                OpenForms.Remove(form);
             }
+        }
+
+        private static void AddEventHandler(Control control, string event_name, MethodInfo handler)
+        {
+            var evt = control.GetType().GetEvent(event_name);
+            var del = Delegate.CreateDelegate(evt.EventHandlerType, handler);
+            evt.AddEventHandler(control, del);
         }
     }
 }

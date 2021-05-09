@@ -40,6 +40,9 @@ namespace Example
             var lib = GetDependency<Lib.Lib>("Lib");
             var map = lib.SignatureManager.Get(AuroraType.TacticalMapForm);
 
+            // add event handler
+            lib.RegisterEventHandler(AuroraType.ClassDesignForm, "Shown", GetType().GetMethod("OnClassDesignFormShown", AccessTools.all));
+
             // Harmony
             var ctor = (MethodBase)map.GetMember(".ctor", AccessTools.all)[0];
             var method = new HarmonyMethod(GetType().GetMethod("PatchTacticalMapConstructor", AccessTools.all));
@@ -99,6 +102,11 @@ namespace Example
             __instance.BackColor = BackColor;
 
             MessageBox.Show("Harmony patched!");
+        }
+
+        private static void OnClassDesignFormShown(object sender, EventArgs e)
+        {
+            MessageBox.Show("You've opened the class design");
         }
     }
 
