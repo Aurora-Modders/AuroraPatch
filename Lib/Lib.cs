@@ -19,8 +19,7 @@ namespace Lib
         public DatabaseManager DatabaseManager { get; private set; } = null; // available on PostStart
 
         private static readonly HashSet<Form> OpenForms = new HashSet<Form>();
-        private static readonly Dictionary<AuroraType, List<Tuple<string, MethodInfo, string>>> EventHandlers = new Dictionary<AuroraType, List<Tuple<string, MethodInfo, string>>>();
-        private static volatile bool CanRegisterEventHandlers = true;
+        private static readonly Dictionary<Type, List<Tuple<string, MethodInfo, string>>> EventHandlers = new Dictionary<Type, List<Tuple<string, MethodInfo, string>>>();
 
         public List<Form> GetOpenForms()
         {
@@ -35,19 +34,16 @@ namespace Lib
 
         public void RegisterEventHandler(AuroraType form, string event_name, MethodInfo handler, string control_name = null)
         {
-            if (!CanRegisterEventHandlers)
-            {
-                return;
-            }
-
             lock (EventHandlers)
             {
-                if (!EventHandlers.ContainsKey(form))
+                var type = SignatureManager.Get(form);
+
+                if (!EventHandlers.ContainsKey(type))
                 {
-                    EventHandlers.Add(form, new List<Tuple<string, MethodInfo, string>>());
+                    EventHandlers.Add(type, new List<Tuple<string, MethodInfo, string>>());
                 }
 
-                EventHandlers[form].Add(new Tuple<string, MethodInfo, string>(event_name, handler, control_name));
+                EventHandlers[type].Add(new Tuple<string, MethodInfo, string>(event_name, handler, control_name));
             }
         }
 
@@ -63,13 +59,6 @@ namespace Lib
                 var method = new HarmonyMethod(GetType().GetMethod("PostfixFormConstructor", AccessTools.all));
                 harmony.Patch(ctor, null, method);
             }
-        }
-
-        protected override void PreStart(Harmony harmony)
-        {
-            CanRegisterEventHandlers = false;
-
-
         }
 
         protected override void PostStart()

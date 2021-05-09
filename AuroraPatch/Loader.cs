@@ -141,22 +141,6 @@ namespace AuroraPatch
             }
             Program.Logger.LogInfo("Done running Load");
 
-            Program.Logger.LogInfo("Running PreStart");
-            foreach (var patch in patches)
-            {
-                Program.Logger.LogInfo("PreStart patch " + patch.Name);
-
-                try
-                {
-                    patch.PreStartInternal();
-                }
-                catch (Exception e)
-                {
-                    Program.Logger.LogError($"Patch PreStart exception: {e}");
-                }
-            }
-            Program.Logger.LogInfo("Done running PreStart");
-
             Program.Logger.LogInfo("Starting Aurora");
             TacticalMap = GetTacticalMap(AuroraAssembly);
             TacticalMap.Shown += MapShown;

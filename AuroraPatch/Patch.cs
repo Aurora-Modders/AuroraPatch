@@ -35,7 +35,7 @@ namespace AuroraPatch
         /// </summary>
         public T GetDependency<T>(string name) where T : Patch
         {
-            return (T)LoadedPatches.Single(p => p.Name == name);
+            return (T)Loader.LoadedPatches.Single(p => p.Name == name);
         }
 
         /// <summary>
@@ -136,15 +136,6 @@ namespace AuroraPatch
         }
 
         /// <summary>
-        /// Called immediately before game start.
-        /// </summary>
-        /// <param name="aurora"></param>
-        protected virtual void PreStart(Harmony harmony)
-        {
-
-        }
-
-        /// <summary>
         /// Called immediately after game start. You can now invoke code on Aurora's UI thread and access the TacticalMap.
         /// </summary>
         protected virtual void PostStart()
@@ -163,11 +154,6 @@ namespace AuroraPatch
         internal void LoadInternal()
         {
             Load(new Harmony(Name));
-        }
-
-        internal void PreStartInternal()
-        {
-            PreStart(new Harmony(Name));
         }
 
         internal void PostStartInternal()
