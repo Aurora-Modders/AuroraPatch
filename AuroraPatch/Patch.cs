@@ -15,7 +15,6 @@ namespace AuroraPatch
         public string Name => GetType().Name;
         public string AuroraExecutable => Loader.AuroraExecutable; // available on Load
         public string AuroraChecksum => Loader.AuroraChecksum; // available on Load
-        public IEnumerable<Patch> LoadedPatches => Loader.LoadedPatches; // available on Load
         public Assembly AuroraAssembly => Loader.AuroraAssembly; // available on Load
         public Form TacticalMap => Loader.TacticalMap; // available on PostStart
 

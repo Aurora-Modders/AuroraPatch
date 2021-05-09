@@ -37,7 +37,7 @@ namespace Example
             var checksum = AuroraChecksum;
 
             // dependency
-            var lib = (Lib.Lib)LoadedPatches.Single(p => p.Name == "Lib");
+            var lib = GetDependency<Lib.Lib>("Lib");
             var map = lib.SignatureManager.Get(AuroraType.TacticalMapForm);
 
             // Harmony
@@ -51,7 +51,7 @@ namespace Example
             var message = "Example patch loaded!\n";
 
             // read in-memory db
-            var lib = (Lib.Lib)LoadedPatches.Single(p => p.Name == "Lib");
+            var lib = GetDependency<Lib.Lib>("Lib");
             var table = lib.DatabaseManager.ExecuteQuery("SELECT RaceName FROM FCT_Race");
 
             foreach (DataRow row in table.Rows)
