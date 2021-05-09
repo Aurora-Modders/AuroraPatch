@@ -16,8 +16,16 @@ namespace AuroraPatch
             InitializeComponent();
 
             Loader = loader;
-            Patches = Loader.FindPatches();
-            Loader.SortPatches(Patches);
+            try
+            {
+                Patches = Loader.FindPatches();
+                Loader.SortPatches(Patches);
+            }
+            catch (Exception e)
+            {
+                Program.Logger.LogCritical($"Failed to find patches. {e}");
+                MessageBox.Show("Failed to find patches. You can still play Aurora without patches.");
+            }
 
             UpdateList();
         }
@@ -31,7 +39,15 @@ namespace AuroraPatch
                 return;
             }
 
-            Loader.StartAurora(Patches);
+            try
+            {
+                Loader.StartAurora(Patches);
+            }
+            catch (Exception ex)
+            {
+                Program.Logger.LogCritical($"Failed to start Aurora. {ex}");
+                MessageBox.Show("Failed to start Aurora.");
+            }
         }
 
         private void UpdateList()
@@ -67,7 +83,14 @@ namespace AuroraPatch
             if (index >= 0)
             {
                 var patch = Patches.Single(p => p.Name == (string)ListPatches.Items[index]);
-                patch.ChangeSettingsInternal();
+                try
+                {
+                    patch.ChangeSettingsInternal();
+                }
+                catch (Exception ex)
+                {
+                    Program.Logger.LogError($"Failed to change settings for Patch {patch.Name}. {ex}");
+                }
             }
         }
 

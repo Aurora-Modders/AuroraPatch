@@ -13,10 +13,10 @@ namespace AuroraPatch
     public abstract class Patch
     {
         public string Name => GetType().Name;
-        public string AuroraExecutablePath => Loader.AuroraExecutablePath; // available on Load
-        public string AuroraChecksum => Loader.AuroraChecksum; // available on Load
-        public Assembly AuroraAssembly => Loader.AuroraAssembly; // available on Load
-        public Form TacticalMap => Loader.TacticalMap; // available on PostStart
+        public string AuroraExecutablePath => Loader.AuroraExecutablePath; // available on Loaded
+        public string AuroraChecksum => Loader.AuroraChecksum; // available on Loaded
+        public Assembly AuroraAssembly => Loader.AuroraAssembly; // available on Loaded
+        public Form TacticalMap => Loader.TacticalMap; // available on Started
 
         /// <summary>
         /// A description for your mod, shown on the AuroraPatch UI.
@@ -34,11 +34,20 @@ namespace AuroraPatch
         /// </summary>
         public T GetDependency<T>(string name) where T : Patch
         {
-            return (T)Loader.LoadedPatches.Single(p => p.Name == name);
+            try
+            {
+                return (T)Loader.LoadedPatches.Single(p => p.Name == name);
+            }
+            catch (Exception e)
+            {
+                LogError($"Failed to get dependency {name}. {e}");
+
+                return null;
+            }
         }
 
         /// <summary>
-        /// Run code on Aurora's UI thread. Only available on PostStart.
+        /// Run code on Aurora's UI thread. Only available on Started..
         /// </summary>
         public object InvokeOnUIThread(Delegate method, params object[] args)
         {
@@ -59,20 +68,27 @@ namespace AuroraPatch
         /// </summary>
         public void Serialize<T>(string id, T obj)
         {
-            var serializer = new JsonSerializer
+            try
             {
-                Formatting = Formatting.Indented
-            };
-            serializer.Converters.Add(new StringEnumConverter());
+                var serializer = new JsonSerializer
+                {
+                    Formatting = Formatting.Indented
+                };
+                serializer.Converters.Add(new StringEnumConverter());
 
-            var dir = Path.Combine(Path.GetDirectoryName(AuroraExecutablePath), "Patches", Name);
-            Directory.CreateDirectory(dir);
-            var file = Path.Combine(dir, id + ".json");
+                var dir = Path.Combine(Path.GetDirectoryName(AuroraExecutablePath), "Patches", Name);
+                Directory.CreateDirectory(dir);
+                var file = Path.Combine(dir, id + ".json");
 
-            using (var reader = new StreamWriter(file))
-            using (var json = new JsonTextWriter(reader))
+                using (var reader = new StreamWriter(file))
+                using (var json = new JsonTextWriter(reader))
+                {
+                    serializer.Serialize(json, obj);
+                }
+            }
+            catch (Exception e)
             {
-                serializer.Serialize(json, obj);
+                LogError($"Failed to serialize resourcce {id}. {e}");
             }
         }
 
@@ -81,22 +97,27 @@ namespace AuroraPatch
         /// </summary>
         public T Deserialize<T>(string id)
         {
-            var serializer = new JsonSerializer
+            try
             {
-                Formatting = Formatting.Indented
-            };
-            serializer.Converters.Add(new StringEnumConverter());
+                var serializer = new JsonSerializer
+                {
+                    Formatting = Formatting.Indented
+                };
+                serializer.Converters.Add(new StringEnumConverter());
 
-            var file = Path.Combine(Path.GetDirectoryName(AuroraExecutablePath), "Patches", Name, id + ".json");
-            if (!File.Exists(file))
-            {
-                throw new IOException($"Resource {id} not found");
+                var file = Path.Combine(Path.GetDirectoryName(AuroraExecutablePath), "Patches", Name, id + ".json");
+
+                using (var reader = new StreamReader(file))
+                using (var json = new JsonTextReader(reader))
+                {
+                    return serializer.Deserialize<T>(json);
+                }
             }
-
-            using (var reader = new StreamReader(file))
-            using (var json = new JsonTextReader(reader))
+            catch (Exception e)
             {
-                return serializer.Deserialize<T>(json);
+                LogError($"Failed to deserialize resource {id}. {e}");
+
+                return default(T);
             }
         }
 
@@ -128,14 +149,14 @@ namespace AuroraPatch
         /// <summary>
         /// Called after the Aurora assembly is loaded.
         /// </summary>
-        /// <param name="aurora"></param>
+        /// <param name="harmony"></param>
         protected virtual void Loaded(Harmony harmony)
         {
 
         }
 
         /// <summary>
-        /// Called immediately after game start. You can now invoke code on Aurora's UI thread and access the TacticalMap.
+        /// Called after the game is started. You can now invoke code on Aurora's UI thread and access the TacticalMap.
         /// </summary>
         protected virtual void Started()
         {
@@ -143,7 +164,7 @@ namespace AuroraPatch
         }
 
         /// <summary>
-        /// Called when the user clicks "Change settings."
+        /// Called when the user clicks "Change settings" on the AuroraPatch UI.
         /// </summary>
         protected virtual void ChangeSettings()
         {

@@ -14,8 +14,8 @@ namespace AuroraPatch
         internal readonly string AuroraExecutablePath;
         internal readonly string AuroraChecksum;
         internal readonly List<Patch> LoadedPatches = new List<Patch>();
-        internal Assembly AuroraAssembly { get; set; } = null;
-        internal Form TacticalMap { get; set; } = null;
+        internal volatile Assembly AuroraAssembly = null;
+        internal volatile Form TacticalMap = null;
 
         internal Loader(string exe, string checksum)
         {
@@ -142,7 +142,7 @@ namespace AuroraPatch
             Program.Logger.LogInfo("Done running Loaded");
 
             Program.Logger.LogInfo("Starting Aurora");
-            TacticalMap = GetTacticalMap(AuroraAssembly);
+            TacticalMap = CreateTacticalMap(AuroraAssembly);
             TacticalMap.Shown += MapShown;
             TacticalMap.Show();
         }
@@ -179,7 +179,7 @@ namespace AuroraPatch
         /// </summary>
         /// <param name="assembly"></param>
         /// <returns>TacticalMap Form object</returns>
-        private Form GetTacticalMap(Assembly assembly)
+        private Form CreateTacticalMap(Assembly assembly)
         {
             try
             {
@@ -202,17 +202,12 @@ namespace AuroraPatch
                             }
                         }
 
-                        if (buttons >= 60 && buttons <= 80 && checkboxes >= 60 && checkboxes <= 80)
-                        {
-                            return true;
-                            //Program.Logger.LogInfo("TacticalMap found: " + type.Name);
-                            //var map = (Form)Activator.CreateInstance(type);
-
-                            //return map;
-                        }
+                        return buttons >= 60 && buttons <= 80 && checkboxes >= 60 && checkboxes <= 80;
                     }
-
-                    return false;
+                    else
+                    {
+                        return false;
+                    }
                 });
 
                 Program.Logger.LogInfo($"TacticalMap found: {map.Name}");
@@ -221,9 +216,9 @@ namespace AuroraPatch
             }
             catch (Exception e)
             {
-                Program.Logger.LogCritical($"TacticalMap not found: {e}");
+                Program.Logger.LogCritical($"Failed to create TacticalMap. {e}");
 
-                throw new Exception("TacticalMap not found");
+                throw new Exception("Failed to create TacticalMap.");
             }
         }
     }

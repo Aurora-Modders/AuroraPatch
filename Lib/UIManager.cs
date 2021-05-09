@@ -98,17 +98,17 @@ namespace Lib
 
             try
             {
-                var formtype = Lib.SignatureManager.Get(AuroraType.EconomicsForm);
+                var formtype = Lib.SignatureManager.Get(type);
                 var form = Lib.GetOpenForms().FirstOrDefault(f => f.GetType().Name == formtype.Name);
 
                 var t = new Task(() =>
                 {
                     try
                     {
-                        var end = DateTime.UtcNow + TimeSpan.FromSeconds(10);
+                        var end = DateTime.UtcNow + TimeSpan.FromSeconds(30);
                         while (form == null)
                         {
-                            Lib.LogInfo($"Waiting for form");
+                            Lib.LogDebug($"Waiting for form");
                             Thread.Sleep(100);
                             form = Lib.GetOpenForms().FirstOrDefault(f => f.GetType().Name == formtype.Name);
 
@@ -120,7 +120,7 @@ namespace Lib
 
                         if (form == null)
                         {
-                            Lib.LogWarning($"Could not find open form {type}");
+                            Lib.LogError($"Could not find open form {type}");
 
                             return;
                         }
