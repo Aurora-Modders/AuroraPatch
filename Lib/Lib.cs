@@ -15,6 +15,7 @@ namespace Lib
         public override string Description => "A library of useful features for patch creators.";
         public KnowledgeBase KnowledgeBase { get; private set; } = null; // available on Load
         public SignatureManager SignatureManager { get; private set; } = null; // available on Load
+        public UIManager UIManager { get; private set; } // available on Load
         public DatabaseManager DatabaseManager { get; private set; } = null; // available on PostStart
 
         private static readonly HashSet<Form> OpenForms = new HashSet<Form>();

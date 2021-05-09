@@ -31,6 +31,14 @@ namespace AuroraPatch
         internal Loader Loader { get; set; }
 
         /// <summary>
+        /// Get one of your dependencies.
+        /// </summary>
+        public T GetDependency<T>(string name) where T : Patch
+        {
+            return (T)LoadedPatches.Single(p => p.Name == name);
+        }
+
+        /// <summary>
         /// Run code on Aurora's UI thread. Only available on PostStart.
         /// </summary>
         public object InvokeOnUIThread(Delegate method, params object[] args)
