@@ -1,4 +1,5 @@
-﻿using HarmonyLib;
+﻿using Automation.Forms;
+using HarmonyLib;
 using Lib;
 using System;
 using System.Collections.Generic;
@@ -14,11 +15,20 @@ namespace Automation
     {
         public override IEnumerable<string> Dependencies => new[] { "Lib" };
 
+        public Economics Economics { get; private set; } = null;
+
+        internal Lib.Lib Lib { get; private set; } = null;
+
+        protected override void Loaded(Harmony harmony)
+        {
+            Economics = new Economics() { Automation = this };
+
+            Lib = GetDependency<Lib.Lib>("Lib");
+        }
+
         protected override void Started()
         {
-            var lib = GetDependency<Lib.Lib>("Lib");
-
-            foreach (var button in lib.KnowledgeBase.GetTimeIncrementButtons())
+            foreach (var button in Lib.KnowledgeBase.GetTimeIncrementButtons())
             {
                 LogInfo($"Button {button.Name} click patched");
                 button.Click += OnButtonClick;
@@ -29,54 +39,15 @@ namespace Automation
         {
             LogInfo($"You've clicked a time increment button and opened the eco window");
 
-            var lib = GetDependency<Lib.Lib>("Lib");
-            var ui = lib.UIManager;
-
-            ui.RunOnForm(AuroraType.EconomicsForm, form =>
+            Lib.UIManager.RunOnForm(AuroraType.EconomicsForm, form =>
             {
-                foreach (var c in ui.IterateControls(form))
+                foreach (var c in UIManager.IterateControls(form))
                 {
                     LogInfo($"Control type {c.GetType().Name} name {c.Name}");
                 }
-
-                var poptree = ui.GetControlByName<TreeView>(form, "tvPopList");
-                foreach (TreeNode system in poptree.Nodes)
-                {
-                    LogInfo($"System {system.Text}");
-
-                    foreach (TreeNode pop in system.Nodes)
-                    {
-                        LogInfo($"Pop {pop.Text}");
-                    }
-                }
-
-                var tabcontrol = ui.GetControlByName<TabControl>(form, "tabPopulation");
-                var industrytab = ui.GetControlByName<TabPage>(form, "tabIndustry");
-                tabcontrol.SelectedTab = industrytab;
-
-                var constructiontypecombo = ui.GetControlByName<ComboBox>(form, "cboConstructionType");
-                foreach (var item in constructiontypecombo.Items)
-                {
-                    if (item.ToString() == "Components")
-                    {
-                        constructiontypecombo.SelectedItem = item;
-                    }
-                }
-
-                var projects = ui.GetControlByName<ListBox>(form, "lstPI");
-                LogInfo($"Listbox display member {projects.DisplayMember}");
-
-                foreach (var item in projects.Items.OfType<object>().ToList())
-                {
-                    var displayed = item.GetType().GetProperty(projects.DisplayMember).GetValue(item, null).ToString();
-                    LogInfo($"Listbox item {displayed}");
-
-                    if (displayed == "Diplomacy Module")
-                    {
-                        projects.SelectedItem = item;
-                    }
-                }
             });
+
+            Economics.CreateConstructionProject("Earth", "Components", "Diplomacy Module",3 ,40);
         }
     }
 }

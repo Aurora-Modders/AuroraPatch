@@ -46,7 +46,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AuroraForm.cs" />
     <Compile Include="Automation.cs" />
+    <Compile Include="Forms\Economics.cs" />
+    <Compile Include="Forms\FleetWindow.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

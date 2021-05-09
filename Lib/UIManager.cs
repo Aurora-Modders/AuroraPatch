@@ -10,14 +10,7 @@ namespace Lib
 {
     public class UIManager
     {
-        private readonly Lib Lib;
-
-        internal UIManager(Lib lib)
-        {
-            Lib = lib;
-        }
-
-        public IEnumerable<Control> IterateControls(Control control)
+        public static IEnumerable<Control> IterateControls(Control control)
         {
             var stack = new Stack<Control>();
             stack.Push(control);
@@ -35,56 +28,16 @@ namespace Lib
             }
         }
 
-        public T GetControlByName<T>(Control parent, string name) where T : Control
+        public static T GetControlByName<T>(Control parent, string name) where T : Control
         {
             return (T)IterateControls(parent).Single(c => c.Name == name);
         }
 
-        public bool OpenFormInstance(AuroraType type)
+        private readonly Lib Lib;
+
+        internal UIManager(Lib lib)
         {
-            try
-            {
-                var formtype = Lib.SignatureManager.Get(type);
-                if (formtype == null)
-                {
-                    return false;
-                }
-
-                foreach (var open in Lib.GetOpenForms())
-                {
-                    if (open.GetType().Name == formtype.Name)
-                    {
-                        return true;
-                    }
-                }
-
-                if (Lib.TacticalMap == null)
-                {
-                    return false;
-                }
-
-                var name = Lib.KnowledgeBase.GetFormOpenButtonName(type);
-                if (name == null)
-                {
-                    return false;
-                }
-
-                var action = new Action(() =>
-                {
-                    var button = GetControlByName<Button>(Lib.TacticalMap, name);
-                    Lib.TacticalMap.Activate();
-                    button.PerformClick();
-                });
-                Lib.InvokeOnUIThread(action);
-
-                return true;
-            }
-            catch (Exception e)
-            {
-                Lib.LogError($"UIManager failed to open form {type}. {e}");
-
-                return false;
-            }
+            Lib = lib;
         }
 
         public void RunOnForm(AuroraType type, Action<Form> action)
@@ -143,7 +96,54 @@ namespace Lib
             {
                 Lib.LogError($"Failed to run on form {type}. {e}");
             }
-            
+
+        }
+
+        public bool OpenFormInstance(AuroraType type)
+        {
+            try
+            {
+                var formtype = Lib.SignatureManager.Get(type);
+                if (formtype == null)
+                {
+                    return false;
+                }
+
+                foreach (var open in Lib.GetOpenForms())
+                {
+                    if (open.GetType().Name == formtype.Name)
+                    {
+                        return true;
+                    }
+                }
+
+                if (Lib.TacticalMap == null)
+                {
+                    return false;
+                }
+
+                var name = Lib.KnowledgeBase.GetFormOpenButtonName(type);
+                if (name == null)
+                {
+                    return false;
+                }
+
+                var action = new Action(() =>
+                {
+                    var button = GetControlByName<Button>(Lib.TacticalMap, name);
+                    Lib.TacticalMap.Activate();
+                    button.PerformClick();
+                });
+                Lib.InvokeOnUIThread(action);
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                Lib.LogError($"UIManager failed to open form {type}. {e}");
+
+                return false;
+            }
         }
     }
 }

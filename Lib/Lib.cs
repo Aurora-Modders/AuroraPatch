@@ -37,7 +37,9 @@ namespace Lib
         {
             if (!handler.IsStatic)
             {
-                throw new Exception($"Event handler {handler.Name} is not static");
+                LogError($"Event handler {handler.DeclaringType.Name}.{handler.Name} is not static.");
+
+                return;
             }
 
             lock (EventHandlers)
@@ -93,7 +95,7 @@ namespace Lib
                     return;
                 }
 
-                var controls = Instance.UIManager.IterateControls(__instance).ToList();
+                var controls = UIManager.IterateControls(__instance).ToList();
 
                 foreach (var handler in EventHandlers[key])
                 {
@@ -115,7 +117,7 @@ namespace Lib
                     }
                     catch (Exception e)
                     {
-                        Instance.LogError($"Failed to add eventhandler {handler.Item2.DeclaringType.Name}.{handler.Item2.Name}");
+                        Instance.LogError($"Failed to add eventhandler {handler.Item2.DeclaringType.Name}.{handler.Item2.Name}. {e}");
                     }
                 }
             }
