@@ -14,7 +14,7 @@ namespace Automation
     {
         public override IEnumerable<string> Dependencies => new[] { "Lib" };
 
-        protected override void PostStart()
+        protected override void Started()
         {
             var lib = GetDependency<Lib.Lib>("Lib");
 

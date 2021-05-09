@@ -10,7 +10,7 @@ namespace BlueBeGone
         public override string Description => "Simplest possible theme that swaps all blue with black.";
         public override IEnumerable<string> Dependencies => new[] { "UIControls" };
 
-        protected override void Load(Harmony harmony)
+        protected override void Loaded(Harmony harmony)
         {
             UIControls.UIControls.GlobalColorSwaps.Add(Color.FromArgb(0, 0, 64), Color.Black);
         }

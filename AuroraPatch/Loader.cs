@@ -11,7 +11,7 @@ namespace AuroraPatch
 {
     internal class Loader
     {
-        internal readonly string AuroraExecutable;
+        internal readonly string AuroraExecutablePath;
         internal readonly string AuroraChecksum;
         internal readonly List<Patch> LoadedPatches = new List<Patch>();
         internal Assembly AuroraAssembly { get; set; } = null;
@@ -19,14 +19,14 @@ namespace AuroraPatch
 
         internal Loader(string exe, string checksum)
         {
-            AuroraExecutable = exe;
+            AuroraExecutablePath = exe;
             AuroraChecksum = checksum;
         }
 
         internal List<Patch> FindPatches()
         {
             var patches = new List<Patch>();
-            string patchesDirectory = Path.Combine(Path.GetDirectoryName(AuroraExecutable), "Patches");
+            string patchesDirectory = Path.Combine(Path.GetDirectoryName(AuroraExecutablePath), "Patches");
             Directory.CreateDirectory(patchesDirectory);
 
             Program.Logger.LogInfo($"Loading patches from {patchesDirectory}");
@@ -121,25 +121,25 @@ namespace AuroraPatch
             TacticalMap = null;
             LoadedPatches.Clear();
 
-            Program.Logger.LogInfo("Loading Aurora " + AuroraExecutable + " with checksum " + AuroraChecksum);
-            AuroraAssembly = Assembly.LoadFile(AuroraExecutable);
+            Program.Logger.LogInfo("Loading Aurora " + AuroraExecutablePath + " with checksum " + AuroraChecksum);
+            AuroraAssembly = Assembly.LoadFile(AuroraExecutablePath);
 
-            Program.Logger.LogInfo("Running Load");
+            Program.Logger.LogInfo("Running Loaded");
             foreach (var patch in patches)
             {
                 Program.Logger.LogInfo("Load patch " + patch.Name);
 
                 try
                 {
-                    patch.LoadInternal();
+                    patch.LoadedInternal();
                     LoadedPatches.Add(patch);
                 }
                 catch (Exception e)
                 {
-                    Program.Logger.LogError($"Patch Load exception: {e}");
+                    Program.Logger.LogError($"Patch Loaded exception: {e}");
                 }
             }
-            Program.Logger.LogInfo("Done running Load");
+            Program.Logger.LogInfo("Done running Loaded");
 
             Program.Logger.LogInfo("Starting Aurora");
             TacticalMap = GetTacticalMap(AuroraAssembly);
@@ -154,21 +154,21 @@ namespace AuroraPatch
         /// <param name="e"></param>
         private void MapShown(object sender, EventArgs e)
         {
-            Program.Logger.LogInfo("Running PostStart");
+            Program.Logger.LogInfo("Running Started");
             foreach (var patch in LoadedPatches)
             {
-                Program.Logger.LogInfo($"PostStart patch {patch.Name}");
+                Program.Logger.LogInfo($"Started patch {patch.Name}");
 
                 try
                 {
-                    patch.PostStartInternal();
+                    patch.StartedInternal();
                 }
                 catch (Exception ex)
                 {
-                    Program.Logger.LogError($"Patch PostStart exception {ex}");
+                    Program.Logger.LogError($"Patch Started exception {ex}");
                 }
             }
-            Program.Logger.LogInfo("Done running PostStart");
+            Program.Logger.LogInfo("Done running Started");
         }
 
         /// <summary>

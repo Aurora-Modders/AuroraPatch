@@ -27,7 +27,7 @@ namespace UIControls
         /// Load our patch and setup our custom Shown event handler on every form.
         /// </summary>
         /// <param name="harmony"></param>
-        protected override void Load(Harmony harmony)
+        protected override void Loaded(Harmony harmony)
         {
             HarmonyMethod postfixMethod = new HarmonyMethod(GetType().GetMethod("FormConstructorPostfix", AccessTools.all));
             foreach (var type in AuroraAssembly.GetTypes())

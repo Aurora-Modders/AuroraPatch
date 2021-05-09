@@ -47,7 +47,7 @@ namespace Lib
             }
         }
 
-        protected override void Load(Harmony harmony)
+        protected override void Loaded(Harmony harmony)
         {
             KnowledgeBase = new KnowledgeBase(this);
             SignatureManager = new SignatureManager(this);
@@ -61,7 +61,7 @@ namespace Lib
             }
         }
 
-        protected override void PostStart()
+        protected override void Started()
         {
             DatabaseManager = new DatabaseManager(this);
         }

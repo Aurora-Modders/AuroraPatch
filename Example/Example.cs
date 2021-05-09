@@ -19,7 +19,7 @@ namespace Example
         public override string Description => "An example patch.";
         public override IEnumerable<string> Dependencies => new[] { "Lib" };
 
-        protected override void Load(Harmony harmony)
+        protected override void Loaded(Harmony harmony)
         {
             LogInfo("Loading ExamplePatch...");
 
@@ -33,7 +33,7 @@ namespace Example
             }
 
             // get the exe and its checksum
-            var exe = AuroraExecutable;
+            var exe = AuroraExecutablePath;
             var checksum = AuroraChecksum;
 
             // dependency
@@ -46,7 +46,7 @@ namespace Example
             harmony.Patch(ctor, null, method);
         }
 
-        protected override void PostStart()
+        protected override void Started()
         {
             var message = "Example patch loaded!\n";
 

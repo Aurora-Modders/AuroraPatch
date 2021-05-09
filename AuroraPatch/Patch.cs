@@ -13,7 +13,7 @@ namespace AuroraPatch
     public abstract class Patch
     {
         public string Name => GetType().Name;
-        public string AuroraExecutable => Loader.AuroraExecutable; // available on Load
+        public string AuroraExecutablePath => Loader.AuroraExecutablePath; // available on Load
         public string AuroraChecksum => Loader.AuroraChecksum; // available on Load
         public Assembly AuroraAssembly => Loader.AuroraAssembly; // available on Load
         public Form TacticalMap => Loader.TacticalMap; // available on PostStart
@@ -65,7 +65,7 @@ namespace AuroraPatch
             };
             serializer.Converters.Add(new StringEnumConverter());
 
-            var dir = Path.Combine(Path.GetDirectoryName(AuroraExecutable), "Patches", Name);
+            var dir = Path.Combine(Path.GetDirectoryName(AuroraExecutablePath), "Patches", Name);
             Directory.CreateDirectory(dir);
             var file = Path.Combine(dir, id + ".json");
 
@@ -87,7 +87,7 @@ namespace AuroraPatch
             };
             serializer.Converters.Add(new StringEnumConverter());
 
-            var file = Path.Combine(Path.GetDirectoryName(AuroraExecutable), "Patches", Name, id + ".json");
+            var file = Path.Combine(Path.GetDirectoryName(AuroraExecutablePath), "Patches", Name, id + ".json");
             if (!File.Exists(file))
             {
                 throw new IOException($"Resource {id} not found");
@@ -129,7 +129,7 @@ namespace AuroraPatch
         /// Called after the Aurora assembly is loaded.
         /// </summary>
         /// <param name="aurora"></param>
-        protected virtual void Load(Harmony harmony)
+        protected virtual void Loaded(Harmony harmony)
         {
 
         }
@@ -137,7 +137,7 @@ namespace AuroraPatch
         /// <summary>
         /// Called immediately after game start. You can now invoke code on Aurora's UI thread and access the TacticalMap.
         /// </summary>
-        protected virtual void PostStart()
+        protected virtual void Started()
         {
 
         }
@@ -150,14 +150,14 @@ namespace AuroraPatch
 
         }
 
-        internal void LoadInternal()
+        internal void LoadedInternal()
         {
-            Load(new Harmony(Name));
+            Loaded(new Harmony(Name));
         }
 
-        internal void PostStartInternal()
+        internal void StartedInternal()
         {
-            PostStart();
+            Started();
         }
 
         internal void ChangeSettingsInternal()
