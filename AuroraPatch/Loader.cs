@@ -196,37 +196,50 @@ namespace AuroraPatch
         /// <returns>TacticalMap Form object</returns>
         private Form GetTacticalMap(Assembly assembly)
         {
-            foreach (var type in assembly.GetTypes())
+            try
             {
-                if (type.BaseType.Equals(typeof(Form)))
+                var map = assembly.GetTypes().Single(type =>
                 {
-                    var buttons = 0;
-                    var checkboxes = 0;
-
-                    foreach (var field in type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
+                    if (type.BaseType.Equals(typeof(Form)))
                     {
-                        if (field.FieldType.Equals(typeof(Button)))
+                        var buttons = 0;
+                        var checkboxes = 0;
+
+                        foreach (var field in type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
                         {
-                            buttons++;
+                            if (field.FieldType.Name == "Button")
+                            {
+                                buttons++;
+                            }
+                            else if (field.FieldType.Name == "CheckBox")
+                            {
+                                checkboxes++;
+                            }
                         }
-                        else if (field.FieldType.Equals(typeof(CheckBox)))
+
+                        if (buttons >= 60 && buttons <= 80 && checkboxes >= 60 && checkboxes <= 80)
                         {
-                            checkboxes++;
+                            return true;
+                            //Program.Logger.LogInfo("TacticalMap found: " + type.Name);
+                            //var map = (Form)Activator.CreateInstance(type);
+
+                            //return map;
                         }
                     }
 
-                    if (buttons >= 60 && buttons <= 80 && checkboxes >= 60 && checkboxes <= 80)
-                    {
-                        Program.Logger.LogInfo("TacticalMap found: " + type.Name);
-                        var map = (Form)Activator.CreateInstance(type);
+                    return false;
+                });
 
-                        return map;
-                    }
-                }
+                Program.Logger.LogInfo($"TacticalMap found: {map.Name}");
+
+                return (Form)Activator.CreateInstance(map);
             }
+            catch (Exception)
+            {
+                Program.Logger.LogCritical("TacticalMap not found");
 
-            Program.Logger.LogCritical("TacticalMap not found");
-            throw new Exception("TacticalMap not found");
+                throw new Exception("TacticalMap not found");
+            }
         }
     }
 }
