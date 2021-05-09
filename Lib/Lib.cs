@@ -55,6 +55,7 @@ namespace Lib
         {
             KnowledgeBase = new KnowledgeBase(this);
             SignatureManager = new SignatureManager(this);
+            UIManager = new UIManager(this);
 
             foreach (var form in AuroraAssembly.GetTypes().Where(t => typeof(Form).IsAssignableFrom(t)))
             {
