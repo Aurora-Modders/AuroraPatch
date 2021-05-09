@@ -35,6 +35,11 @@ namespace Lib
 
         public void RegisterEventHandler(AuroraType form, string event_name, MethodInfo handler, Func<Control, bool> predicate = null)
         {
+            if (!handler.IsStatic)
+            {
+                throw new Exception($"Event handler {handler.Name} is not static");
+            }
+
             lock (EventHandlers)
             {
                 var type = SignatureManager.Get(form);
@@ -57,12 +62,17 @@ namespace Lib
 
             foreach (var form in AuroraAssembly.GetTypes().Where(t => typeof(Form).IsAssignableFrom(t)))
             {
-                var ctor = (MethodBase)form.GetMember(".ctor", AccessTools.all)[0];
-                var method = new HarmonyMethod(GetType().GetMethod("PostfixFormConstructor", AccessTools.all));
-                harmony.Patch(ctor, null, method);
+                try
+                {
+                    var ctor = (MethodBase)form.GetMember(".ctor", AccessTools.all)[0];
+                    var method = new HarmonyMethod(GetType().GetMethod("PostfixFormConstructor", AccessTools.all));
+                    harmony.Patch(ctor, null, method);
+                }
+                catch (Exception e)
+                {
+                    LogError($"Failed to patch Form constructor {form.Name}, exception: {e}");
+                }
             }
-
-            
         }
 
         protected override void Started()
@@ -87,18 +97,25 @@ namespace Lib
 
                 foreach (var handler in EventHandlers[key])
                 {
-                    if (handler.Item3 == null)
+                    try
                     {
-                        // on form itself
-                        AddEventHandler(__instance, handler.Item1, handler.Item2);
-                    }
-                    else
-                    {
-                        // on controls on the form
-                        foreach (var control in controls.Where(c => handler.Item3(c)))
+                        if (handler.Item3 == null)
                         {
-                            AddEventHandler(control, handler.Item1, handler.Item2);
+                            // on form itself
+                            AddEventHandler(__instance, handler.Item1, handler.Item2);
                         }
+                        else
+                        {
+                            // on controls on the form
+                            foreach (var control in controls.Where(c => handler.Item3(c)))
+                            {
+                                AddEventHandler(control, handler.Item1, handler.Item2);
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Instance.LogError($"Failed to add eventhandler {handler.Item2.DeclaringType.Name}.{handler.Item2.Name}");
                     }
                 }
             }

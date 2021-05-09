@@ -58,30 +58,37 @@ namespace Lib
                 return null;
             }
 
-            if (!signature.IsUniqueByChecksum.ContainsKey(Lib.AuroraChecksum))
+            try
             {
-                var types = GetTypes(signature);
-                if (types.Count == 1)
+                if (!signature.IsUniqueByChecksum.ContainsKey(Lib.AuroraChecksum))
                 {
-                    signature.IsUniqueByChecksum.Add(Lib.AuroraChecksum, true);
-                }
-                else
-                {
-                    signature.IsUniqueByChecksum.Add(Lib.AuroraChecksum, false);
+                    var types = GetTypes(signature);
+                    if (types.Count == 1)
+                    {
+                        signature.IsUniqueByChecksum.Add(Lib.AuroraChecksum, true);
+                    }
+                    else
+                    {
+                        signature.IsUniqueByChecksum.Add(Lib.AuroraChecksum, false);
+                    }
+
+                    Save();
                 }
 
-                Save();
+                if (signature.IsUniqueByChecksum[Lib.AuroraChecksum])
+                {
+                    var type = GetTypes(signature).First();
+                    lock (TypeCache)
+                    {
+                        TypeCache[name] = type;
+                    }
+
+                    return type;
+                }
             }
-
-            if (signature.IsUniqueByChecksum[Lib.AuroraChecksum])
+            catch (Exception e)
             {
-                var type = GetTypes(signature).First();
-                lock (TypeCache)
-                {
-                    TypeCache[name] = type;
-                }
-                
-                return type;
+                Lib.LogError($"SignatureManager failed to get Type for {name}. {e}");
             }
 
             return null;

@@ -28,7 +28,14 @@ namespace Lib
             {
                 if (Connection == null)
                 {
-                    GenerateDatabase();
+                    try
+                    {
+                        GenerateDatabase();
+                    }
+                    catch (Exception e)
+                    {
+                        Lib.LogError($"DatabaseManager failed to create in-memory db. {e}");
+                    }
                 }
             }
 
@@ -36,29 +43,45 @@ namespace Lib
             {
                 if (DateTime.UtcNow > NextUpdate)
                 {
-                    var sw = new Stopwatch();
-                    sw.Start();
+                    try
+                    {
+                        var sw = new Stopwatch();
+                        sw.Start();
 
-                    Lib.InvokeOnUIThread(new Action(() => Save()));
-                    NextUpdate = DateTime.UtcNow + TimeSpan.FromSeconds(30);
+                        Lib.InvokeOnUIThread(new Action(() => Save()));
+                        NextUpdate = DateTime.UtcNow + TimeSpan.FromSeconds(30);
 
-                    sw.Stop();
-                    Lib.LogInfo($"In-memory save took {sw.ElapsedMilliseconds} ms");
+                        sw.Stop();
+                        Lib.LogInfo($"In-memory save took {sw.ElapsedMilliseconds} ms");
+                    }
+                    catch (Exception e)
+                    {
+                        Lib.LogError($"DatabaseManager failed to save. {e}");
+                    }
                 }
-                
-                using (var connection = new SQLiteConnection(Connection.ConnectionString))
-                using (var adapter = new SQLiteDataAdapter(query, connection))
+
+                try
                 {
-                    connection.Open();
+                    using (var connection = new SQLiteConnection(Connection.ConnectionString))
+                    using (var adapter = new SQLiteDataAdapter(query, connection))
+                    {
+                        connection.Open();
 
-                    var data = new DataSet();
-                    adapter.Fill(data, "RecordSet");
+                        var data = new DataSet();
+                        adapter.Fill(data, "RecordSet");
 
-                    connection.Close();
+                        connection.Close();
 
-                    return data.Tables["RecordSet"];
+                        return data.Tables["RecordSet"];
+                    }
+                }
+                catch (Exception e)
+                {
+                    Lib.LogError($"DatabaseManager failed to run query {query}. {e}");
                 }
             }
+
+            return null;
         }
 
         private void Save()

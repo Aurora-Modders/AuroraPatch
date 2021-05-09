@@ -42,83 +42,108 @@ namespace Lib
 
         public bool OpenFormInstance(AuroraType type)
         {
-            var formtype = Lib.SignatureManager.Get(type);
-            if (formtype == null)
+            try
             {
-                return false;
-            }
-
-            foreach (var open in Lib.GetOpenForms())
-            {
-                if (open.GetType().Name == formtype.Name)
+                var formtype = Lib.SignatureManager.Get(type);
+                if (formtype == null)
                 {
-                    return true;
+                    return false;
                 }
-            }
 
-            if (Lib.TacticalMap == null)
+                foreach (var open in Lib.GetOpenForms())
+                {
+                    if (open.GetType().Name == formtype.Name)
+                    {
+                        return true;
+                    }
+                }
+
+                if (Lib.TacticalMap == null)
+                {
+                    return false;
+                }
+
+                var name = Lib.KnowledgeBase.GetFormOpenButtonName(type);
+                if (name == null)
+                {
+                    return false;
+                }
+
+                var action = new Action(() =>
+                {
+                    var button = GetControlByName<Button>(Lib.TacticalMap, name);
+                    Lib.TacticalMap.Activate();
+                    button.PerformClick();
+                });
+                Lib.InvokeOnUIThread(action);
+
+                return true;
+            }
+            catch (Exception e)
             {
+                Lib.LogError($"UIManager failed to open form {type}. {e}");
+
                 return false;
             }
-
-            var name = Lib.KnowledgeBase.GetFormOpenButtonName(type);
-            if (name == null)
-            {
-                return false;
-            }
-
-            var action = new Action(() =>
-            {
-                var button = GetControlByName<Button>(Lib.TacticalMap, name);
-                Lib.TacticalMap.Activate();
-                button.PerformClick();
-            });
-            Lib.InvokeOnUIThread(action);
-
-            return true;
         }
 
         public void RunOnForm(AuroraType type, Action<Form> action)
         {
             if (!OpenFormInstance(type))
             {
-                Lib.LogWarning($"Could not open form {type}");
+                Lib.LogError($"UIManager could not open form {type}");
 
                 return;
             }
 
-            var formtype = Lib.SignatureManager.Get(AuroraType.EconomicsForm);
-            var form = Lib.GetOpenForms().FirstOrDefault(f => f.GetType().Name == formtype.Name);
-
-            var t = new Task(() =>
+            try
             {
-                var end = DateTime.UtcNow + TimeSpan.FromSeconds(10);
-                while (form == null)
-                {
-                    Lib.LogInfo($"Waiting for form");
-                    Thread.Sleep(100);
-                    form = Lib.GetOpenForms().FirstOrDefault(f => f.GetType().Name == formtype.Name);
+                var formtype = Lib.SignatureManager.Get(AuroraType.EconomicsForm);
+                var form = Lib.GetOpenForms().FirstOrDefault(f => f.GetType().Name == formtype.Name);
 
-                    if (DateTime.UtcNow > end)
+                var t = new Task(() =>
+                {
+                    try
                     {
-                        break;
+                        var end = DateTime.UtcNow + TimeSpan.FromSeconds(10);
+                        while (form == null)
+                        {
+                            Lib.LogInfo($"Waiting for form");
+                            Thread.Sleep(100);
+                            form = Lib.GetOpenForms().FirstOrDefault(f => f.GetType().Name == formtype.Name);
+
+                            if (DateTime.UtcNow > end)
+                            {
+                                break;
+                            }
+                        }
+
+                        if (form == null)
+                        {
+                            Lib.LogWarning($"Could not find open form {type}");
+
+                            return;
+                        }
+
+                        Lib.InvokeOnUIThread(new Action(() =>
+                        {
+                            form.Activate();
+                            action(form);
+                        }));
                     }
-                }
+                    catch (Exception e)
+                    {
+                        Lib.LogError($"Failed to wait for form {type}. {e}");
+                    }
+                });
 
-                if (form == null)
-                {
-                    Lib.LogWarning($"Could not find open form {type}");
-
-                    return;
-                }
-
-                Lib.InvokeOnUIThread(new Action(() =>
-                {
-                    form.Activate();
-                    action(form);
-                }));
-            });
-            t.Start();
+                t.Start();
+            }
+            catch (Exception e)
+            {
+                Lib.LogError($"Failed to run on form {type}. {e}");
+            }
+            
         }
     }
 }

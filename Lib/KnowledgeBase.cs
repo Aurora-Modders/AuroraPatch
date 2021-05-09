@@ -61,17 +61,24 @@ namespace Lib
                 return null;
             }
 
-            foreach (var field in map.GetType().GetFields(AccessTools.all))
+            try
             {
-                if (field.FieldType.Name != type.Name)
+                foreach (var field in map.GetType().GetFields(AccessTools.all))
                 {
-                    continue;
+                    if (field.FieldType.Name != type.Name)
+                    {
+                        continue;
+                    }
+                    Lib.LogDebug($"GameState field {field.Name}");
+
+                    return field.GetValue(map);
                 }
-
-                Lib.LogDebug($"GameState field {field.Name}");
-
-                return field.GetValue(map);
             }
+            catch (Exception e)
+            {
+                Lib.LogError($"KnowledgeBase failed to retrieve GameState. {e}");
+            }
+            
 
             return null;
         }
@@ -86,21 +93,28 @@ namespace Lib
                 return methods;
             }
 
-            foreach (var method in type.GetMethods(AccessTools.all))
+            try
             {
-                var parameters = method.GetParameters();
-
-                if (parameters.Length != 1)
+                foreach (var method in type.GetMethods(AccessTools.all))
                 {
-                    continue;
-                }
+                    var parameters = method.GetParameters();
 
-                if (parameters[0].ParameterType.Name != "SQLiteConnection")
-                {
-                    continue;
-                }
+                    if (parameters.Length != 1)
+                    {
+                        continue;
+                    }
 
-                methods.Add(method);
+                    if (parameters[0].ParameterType.Name != "SQLiteConnection")
+                    {
+                        continue;
+                    }
+
+                    methods.Add(method);
+                }
+            }
+            catch (Exception e)
+            {
+                Lib.LogError($"KnowledgeBase failed to retrieve save methods. {e}");
             }
 
             return methods;
