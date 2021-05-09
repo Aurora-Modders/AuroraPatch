@@ -46,7 +46,8 @@ namespace AuroraPatch
                     }
                     catch (Exception e)
                     {
-                        Program.Logger.LogError($"File {dll} can not be loaded as Assembly: {e}");
+                        Program.Logger.LogInfo($"File {dll} can not be loaded as Assembly");
+                        Program.Logger.LogDebug($"Full exception: {e}");
                     }
                 }
             }
@@ -70,7 +71,7 @@ namespace AuroraPatch
                 }
                 catch (ReflectionTypeLoadException e)
                 {
-                    Program.Logger.LogError(e.LoaderExceptions.First().Message + " Are you missing a dependency?", false);
+                    Program.Logger.LogError(e.LoaderExceptions.First().Message + " Are you missing a dependency?");
                 }
             }
 
@@ -135,7 +136,7 @@ namespace AuroraPatch
                 }
                 catch (Exception e)
                 {
-                    Program.Logger.LogError($"Patch Load exception {e.Message}");
+                    Program.Logger.LogError($"Patch Load exception: {e}");
                 }
             }
             Program.Logger.LogInfo("Done running Load");
@@ -151,7 +152,7 @@ namespace AuroraPatch
                 }
                 catch (Exception e)
                 {
-                    Program.Logger.LogError($"Patch PreStart exception {e.Message}");
+                    Program.Logger.LogError($"Patch PreStart exception: {e}");
                 }
             }
             Program.Logger.LogInfo("Done running PreStart");
@@ -180,7 +181,7 @@ namespace AuroraPatch
                 }
                 catch (Exception ex)
                 {
-                    Program.Logger.LogError($"Patch PostStart exception {ex.Message}");
+                    Program.Logger.LogError($"Patch PostStart exception {ex}");
                 }
             }
             Program.Logger.LogInfo("Done running PostStart");
@@ -234,9 +235,9 @@ namespace AuroraPatch
 
                 return (Form)Activator.CreateInstance(map);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                Program.Logger.LogCritical("TacticalMap not found");
+                Program.Logger.LogCritical($"TacticalMap not found: {e}");
 
                 throw new Exception("TacticalMap not found");
             }

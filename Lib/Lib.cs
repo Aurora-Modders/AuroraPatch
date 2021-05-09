@@ -13,9 +13,9 @@ namespace Lib
     public class Lib : AuroraPatch.Patch
     {
         public override string Description => "A library of useful features for patch creators.";
-        public KnowledgeBase KnowledgeBase { get; private set; } = null;
-        public SignatureManager SignatureManager { get; private set; } = null;
-        public DatabaseManager DatabaseManager { get; private set; } = null;
+        public KnowledgeBase KnowledgeBase { get; private set; } = null; // available on Load
+        public SignatureManager SignatureManager { get; private set; } = null; // available on Load
+        public DatabaseManager DatabaseManager { get; private set; } = null; // available on PostStart
 
         private static readonly HashSet<Form> OpenForms = new HashSet<Form>();
         private static readonly Dictionary<AuroraType, List<Tuple<string, MethodInfo, string>>> EventHandlers = new Dictionary<AuroraType, List<Tuple<string, MethodInfo, string>>>();
@@ -32,7 +32,7 @@ namespace Lib
             return forms;
         }
 
-        public void RegisterEventHandler(AuroraType form, string event_name, MethodInfo handler, string control_name = "")
+        public void RegisterEventHandler(AuroraType form, string event_name, MethodInfo handler, string control_name = null)
         {
             if (!CanRegisterEventHandlers)
             {
