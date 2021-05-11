@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
+using System.Diagnostics;
 
 namespace Lib
 {
@@ -53,6 +54,26 @@ namespace Lib
 
                 EventHandlers[type].Add(new Tuple<string, MethodInfo, Func<Control, bool>>(event_name, handler, predicate));
             }
+        }
+
+        /// <summary>
+        /// Helper method to determine whether the current stack frame includes Aurora's code.
+        /// Useful to ensure your hooked events only affect Aurora and not AuroraPatch or other patches.
+        /// This function simply checks if the "StartAurora" method is in the callstack.
+        /// </summary>
+        /// <returns></returns>
+        public static bool IsAuroraCode()
+        {
+            var depth = 1;
+            while (true)
+            {
+                var sf = new StackFrame(depth);
+                var method = sf.GetMethod();
+                if (method == null || depth > 100) break;
+                if (method.Name == "StartAurora") return true;
+                depth += 1;
+            }
+            return false;
         }
 
         protected override void Loaded(Harmony harmony)
