@@ -10,10 +10,28 @@ namespace Lib
 {
     public enum AuroraType
     {
-        TacticalMapForm, EconomicsForm, GameState, ClassDesignForm, CreateProjectForm, FleetWindowForm, 
-        MissileDesignForm, TurretDesignForm, GroundUnitDesignForm, CommandersWindowForm, MedalsForm, 
-        RaceWindowForm, SystemViewForm, GalacticMapForm, RaceComparisonForm, DiplomacyForm, TechnologyViewForm, 
+        TacticalMapForm, EconomicsForm, GameState, ClassDesignForm, CreateProjectForm, FleetWindowForm,
+        MissileDesignForm, TurretDesignForm, GroundUnitDesignForm, CommandersWindowForm, MedalsForm,
+        RaceWindowForm, SystemViewForm, GalacticMapForm, RaceComparisonForm, DiplomacyForm, TechnologyViewForm,
         MineralsForm, SectorsForm, EventsForm, GameDetailsForm
+    }
+
+    // TODO: Currently only contains TacticalMap and GalacticMap buttons.
+    public enum AuroraButton
+    {
+        // Tactical Map
+        NormalWaypoint, LastClickedWaypoint, RendezvousWaypoint, PointOfInterestWaypoint, UrgentPointOfInterestWaypoint,
+        DeleteWaypoint, ResetWindows, AddCommanderTheme, AddNameTheme, SubPulse, SubPulse5S, SubPulse30S, SubPulse2M,
+        SubPulse5M, SubPulse20M, SubPulse1H, SubPulse3H, SubPulse8H, SubPulse1D, SubPulse5D, SubPulse30D, Increment,
+        Increment5S, Increment30S, Increment2M, Increment5M, Increment20M, Increment1H, Increment3H, Increment8H,
+        Increment1D, Increment5D, Increment30D, ZoomIn, ZoomOut, Up, Left, Right, Down, ToolbarColony, ToolbarIndustry,
+        ToolbarMining, ToolbarResearch, ToolbarWealth, ToolbarClass, ToolbarProject, ToolbarFleet, ToolbarMissileDesign,
+        ToolbarTurrent, ToolbarGroundForces, ToolbarCommanders, ToolbarMedals, ToolbarRace, ToolbarSystem, ToolbarGalactic,
+        ToolbarComparison, ToolbarIntelligence, ToolbarTechnology, ToolbarSurvey, ToolbarSector, ToolbarEvents,
+        ToolbarRefreshTactical, ToolbarSave, ToolbarGame, ToolbarAuto, SM,
+        // Galactic Map
+        ToolbarHabitable, ToolbarRefreshGalactic, ToolbarGrid, ToolbarUndo, ToolbarSavePositions, AwardMedal, CopyLabel,
+        UpdateText, LabelFont, NewLabel, DeleteLabel, Hull, Station,
     }
 
     public class KnowledgeBase
@@ -23,6 +41,118 @@ namespace Lib
         internal KnowledgeBase(Lib lib)
         {
             Lib = lib;
+        }
+
+        /// <summary>
+        /// Dictionary of all known buttons.
+        /// TODO: List is incomplete - only contains TacticalMap and GalacticMap buttons.
+        /// </summary>
+        private Dictionary<AuroraButton, string> AuroraButtons = new Dictionary<AuroraButton, string>
+        {
+            // Tactical Map
+            { AuroraButton.NormalWaypoint, "cmdNormalWP" },
+            { AuroraButton.LastClickedWaypoint, "cmdLastClickedWP" },
+            { AuroraButton.RendezvousWaypoint,"cmdRendezvousWP" },
+            { AuroraButton.PointOfInterestWaypoint,"cmdPOIWP" },
+            { AuroraButton.UrgentPointOfInterestWaypoint,"cmdUrgentPOIWP" },
+            { AuroraButton.DeleteWaypoint,"cmdDeleteWP" },
+            { AuroraButton.ResetWindows,"cmdResetWindows" },
+            { AuroraButton.AddCommanderTheme,"cmdAddCmdrTheme" },
+            { AuroraButton.AddNameTheme,"cmdAddNameTheme" },
+            { AuroraButton.SubPulse,"cmdSubPulse" },
+            { AuroraButton.SubPulse5S,"cmdSubPulse5S" },
+            { AuroraButton.SubPulse30S,"cmdSubPulse30S" },
+            { AuroraButton.SubPulse2M,"cmdSubPulse2M" },
+            { AuroraButton.SubPulse5M,"cmdSubPulse5M" },
+            { AuroraButton.SubPulse20M,"cmdSubPulse20M" },
+            { AuroraButton.SubPulse1H,"cmdSubPulse1H" },
+            { AuroraButton.SubPulse3H,"cmdSubPulse3H" },
+            { AuroraButton.SubPulse8H,"cmdSubPulse8H" },
+            { AuroraButton.SubPulse1D,"cmdSubPulse1D" },
+            { AuroraButton.SubPulse5D,"cmdSubPulse5D" },
+            { AuroraButton.SubPulse30D,"cmdSubPulse30D" },
+            { AuroraButton.Increment,"cmdIncrement" },
+            { AuroraButton.Increment5S,"cmdIncrement5S" },
+            { AuroraButton.Increment30S,"cmdIncrement30S" },
+            { AuroraButton.Increment2M,"cmdIncrement2M" },
+            { AuroraButton.Increment5M,"cmdIncrement5M" },
+            { AuroraButton.Increment20M,"cmdIncrement20M" },
+            { AuroraButton.Increment1H,"cmdIncrement1H" },
+            { AuroraButton.Increment3H,"cmdIncrement3H" },
+            { AuroraButton.Increment8H,"cmdIncrement8H" },
+            { AuroraButton.Increment1D,"cmdIncrement1D" },
+            { AuroraButton.Increment5D,"cmdIncrement5D" },
+            { AuroraButton.Increment30D,"cmdIncrement30D" },
+            { AuroraButton.ZoomIn,"cmdZoomIn" },
+            { AuroraButton.ZoomOut,"cmdZoomOut" },
+            { AuroraButton.Up,"cmdUp" },
+            { AuroraButton.Down,"cmdDown" },
+            { AuroraButton.Left,"cmdLeft" },
+            { AuroraButton.Right,"cmdRight" },
+            { AuroraButton.ToolbarColony, "cmdToolbarColony" },
+            { AuroraButton.ToolbarIndustry, "cmdToolbarIndustry" },
+            { AuroraButton.ToolbarMining, "cmdToolbarMining" },
+            { AuroraButton.ToolbarResearch, "cmdToolbarResearch" },
+            { AuroraButton.ToolbarWealth, "cmdToolbarWealth" },
+            { AuroraButton.ToolbarClass, "cmdToolbarClass" },
+            { AuroraButton.ToolbarProject, "cmdToolbarProject" },
+            { AuroraButton.ToolbarFleet, "cmdToolbarFleet" },
+            { AuroraButton.ToolbarMissileDesign, "cmdToolbarMissileDesign" },
+            { AuroraButton.ToolbarTurrent, "cmdToolbarTurret" },
+            { AuroraButton.ToolbarGroundForces, "cmdToolbarGroundForces" },
+            { AuroraButton.ToolbarCommanders, "cmdToolbarCommanders" },
+            { AuroraButton.ToolbarMedals, "cmdToolbarMedals" },
+            { AuroraButton.ToolbarRace, "cmdToolbarRace" },
+            { AuroraButton.ToolbarSystem, "cmdToolbarSystem" },
+            { AuroraButton.ToolbarGalactic, "cmdToolbarGalactic" },
+            { AuroraButton.ToolbarComparison, "cmdToolbarComparison" },
+            { AuroraButton.ToolbarIntelligence, "cmdToolbarIntelligence" },
+            { AuroraButton.ToolbarTechnology, "cmdToolbarTechnology" },
+            { AuroraButton.ToolbarSurvey, "cmdToolbarSurvey" },
+            { AuroraButton.ToolbarSector, "cmdToolbarSector" },
+            { AuroraButton.ToolbarEvents, "cmdToolbarEvents" },
+            { AuroraButton.ToolbarRefreshTactical, "cmdToolbarRefreshTactical" },
+            { AuroraButton.ToolbarSave, "cmdToolbarSave" },
+            { AuroraButton.ToolbarGame, "cmdToolbarGame" },
+            { AuroraButton.ToolbarAuto, "cmdToolbarAuto" },
+            { AuroraButton.SM, "cmdSM" },
+            // Galactic Map
+            { AuroraButton.ToolbarHabitable, "cmdToolbarHabitable" },
+            { AuroraButton.ToolbarRefreshGalactic, "mdToolbarRefreshGalactic" },
+            { AuroraButton.ToolbarGrid, "mdToolbarGrid" },
+            { AuroraButton.ToolbarUndo, "mdToolbarUndo" },
+            { AuroraButton.ToolbarSavePositions, "mdToolbarSavePositions" },
+            { AuroraButton.AwardMedal, "mdAwardMedal" },
+            { AuroraButton.CopyLabel, "mdCopyLabel" },
+            { AuroraButton.UpdateText, "mdUpdateText" },
+            { AuroraButton.LabelFont, "mdLabelFont" },
+            { AuroraButton.NewLabel, "mdNewLabel" },
+            { AuroraButton.DeleteLabel, "mdDeleteLabel" },
+            { AuroraButton.Hull, "mdHull" },
+            { AuroraButton.Station, "mdStation" },
+        };
+
+        /// <summary>
+        /// Wrapper around AuroraButtons dictionary so that we can easily fix all patches
+        /// that rely on Lib if the button names change in the future.
+        /// </summary>
+        /// <param name="button"></param>
+        /// <returns></returns>
+        public string GetButtonName(AuroraButton button)
+        {
+            string buttonName;
+            AuroraButtons.TryGetValue(button, out buttonName);
+            return buttonName;
+        }
+
+        /// <summary>
+        /// Wrapper around AuroraButtons dictionary so that we can return the appropriate
+        /// checksum version if button names change in the future.
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<KeyValuePair<AuroraButton, string>> GetKnownButtonNames()
+        {
+            return AuroraButtons.AsEnumerable();
         }
 
         public IEnumerable<KeyValuePair<AuroraType, string>> GetKnownTypeNames()
@@ -157,25 +287,25 @@ namespace Lib
         {
             switch (type)
             {
-                case AuroraType.EconomicsForm: return "cmdToolbarColony";
-                case AuroraType.ClassDesignForm: return "cmdToolbarClass";
-                case AuroraType.CreateProjectForm: return "cmdToolbarProject";
-                case AuroraType.FleetWindowForm: return "cmdToolbarFleet";
-                case AuroraType.MissileDesignForm: return "cmdToolbarMissileDesign";
-                case AuroraType.TurretDesignForm: return "cmdToolbarTurret";
-                case AuroraType.GroundUnitDesignForm: return "cmdToolbarGroundForces";
-                case AuroraType.CommandersWindowForm: return "cmdToolbarCommanders";
-                case AuroraType.MedalsForm: return "cmdToolbarMedals";
-                case AuroraType.RaceWindowForm: return "cmdToolbarRace";
-                case AuroraType.SystemViewForm: return "cmdToolbarSystem";
-                case AuroraType.GalacticMapForm: return "cmdToolbarGalactic";
-                case AuroraType.RaceComparisonForm: return "cmdToolbarComparison";
-                case AuroraType.DiplomacyForm: return "cmdToolbarIntelligence";
-                case AuroraType.TechnologyViewForm: return "cmdToolbarTechnology";
-                case AuroraType.MineralsForm: return "cmdToolbarSurvey";
-                case AuroraType.SectorsForm: return "cmdToolbarSector";
-                case AuroraType.EventsForm: return "cmdToolbarEvents";
-                case AuroraType.GameDetailsForm: return "cmdToolbarGame";
+                case AuroraType.EconomicsForm: return GetButtonName(AuroraButton.ToolbarColony);
+                case AuroraType.ClassDesignForm: return GetButtonName(AuroraButton.ToolbarClass);
+                case AuroraType.CreateProjectForm: return GetButtonName(AuroraButton.ToolbarProject);
+                case AuroraType.FleetWindowForm: return GetButtonName(AuroraButton.ToolbarFleet);
+                case AuroraType.MissileDesignForm: return GetButtonName(AuroraButton.ToolbarMissileDesign);
+                case AuroraType.TurretDesignForm: return GetButtonName(AuroraButton.ToolbarTurrent);
+                case AuroraType.GroundUnitDesignForm: return GetButtonName(AuroraButton.ToolbarGroundForces);
+                case AuroraType.CommandersWindowForm: return GetButtonName(AuroraButton.ToolbarCommanders);
+                case AuroraType.MedalsForm: return GetButtonName(AuroraButton.ToolbarMedals);
+                case AuroraType.RaceWindowForm: return GetButtonName(AuroraButton.ToolbarRace);
+                case AuroraType.SystemViewForm: return GetButtonName(AuroraButton.ToolbarSystem);
+                case AuroraType.GalacticMapForm: return GetButtonName(AuroraButton.ToolbarGalactic);
+                case AuroraType.RaceComparisonForm: return GetButtonName(AuroraButton.ToolbarComparison);
+                case AuroraType.DiplomacyForm: return GetButtonName(AuroraButton.ToolbarIntelligence);
+                case AuroraType.TechnologyViewForm: return GetButtonName(AuroraButton.ToolbarTechnology);
+                case AuroraType.MineralsForm: return GetButtonName(AuroraButton.ToolbarSurvey);
+                case AuroraType.SectorsForm: return GetButtonName(AuroraButton.ToolbarSector);
+                case AuroraType.EventsForm: return GetButtonName(AuroraButton.ToolbarEvents);
+                case AuroraType.GameDetailsForm: return GetButtonName(AuroraButton.ToolbarGame);
                 default: return null;
             }
         }
