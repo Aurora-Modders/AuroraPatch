@@ -123,6 +123,7 @@ namespace AuroraPatch
 
             Program.Logger.LogInfo("Loading Aurora " + AuroraExecutablePath + " with checksum " + AuroraChecksum);
             AuroraAssembly = Assembly.LoadFile(AuroraExecutablePath);
+            Program.Logger.LogInfo($"Assembly FullName: {AuroraAssembly.FullName}");
 
             Program.Logger.LogInfo("Running Loaded");
             foreach (var patch in patches)

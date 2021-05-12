@@ -64,16 +64,28 @@ namespace Lib
         /// <returns></returns>
         public static bool IsAuroraCode()
         {
-            var depth = 1;
+            var depth = 2;
             while (true)
             {
-                var sf = new StackFrame(depth);
+                var sf = new StackFrame(depth, false);
                 var method = sf.GetMethod();
-                if (method == null || depth > 100) break;
-                if (method.Name == "StartAurora") return true;
-                depth += 1;
+                if (method == null || depth > 10)
+                {
+                    return false;
+                }
+                /*
+                if (method.Name == "StartAurora")
+                {
+                    return true;
+                }
+                */
+                if (method.DeclaringType.Assembly.FullName.Contains("Aurora,"))
+                {
+                    return true;
+                }
+
+                depth++;
             }
-            return false;
         }
 
         protected override void Loaded(Harmony harmony)
