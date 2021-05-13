@@ -6,12 +6,12 @@ using System.Windows.Forms;
 
 namespace AuroraPatch
 {
-    public partial class Form1 : Form
+    public partial class AuroraPatchForm : Form
     {
         private readonly Loader Loader;
         private readonly List<Patch> Patches;
 
-        internal Form1(Loader loader) : base()
+        internal AuroraPatchForm(Loader loader) : base()
         {
             InitializeComponent();
 

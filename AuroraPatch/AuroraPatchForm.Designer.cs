@@ -1,7 +1,7 @@
 ﻿
 namespace AuroraPatch
 {
-    partial class Form1
+    partial class AuroraPatchForm
     {
         /// <summary>
         /// Required designer variable.
@@ -83,7 +83,7 @@ namespace AuroraPatch
             this.ButtonChangeSettings.UseVisualStyleBackColor = true;
             this.ButtonChangeSettings.Click += new System.EventHandler(this.ButtonChangeSettings_Click);
             // 
-            // Form1
+            // AuroraPatchForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -93,8 +93,8 @@ namespace AuroraPatch
             this.Controls.Add(this.LabelPatches);
             this.Controls.Add(this.ListPatches);
             this.Controls.Add(this.ButtonStart);
-            this.Name = "Form1";
-            this.Text = "Form1";
+            this.Name = "AuroraPatchForm";
+            this.Text = "AuroraPatch";
             this.ResumeLayout(false);
             this.PerformLayout();
 
