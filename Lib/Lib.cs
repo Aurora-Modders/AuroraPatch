@@ -73,17 +73,10 @@ namespace Lib
                 {
                     return false;
                 }
-                /*
-                if (method.Name == "StartAurora")
+                if (method.DeclaringType != null && method.DeclaringType.Assembly.FullName.Contains("Aurora,"))
                 {
                     return true;
                 }
-                */
-                if (method.DeclaringType.Assembly.FullName.Contains("Aurora,"))
-                {
-                    return true;
-                }
-
                 depth++;
             }
         }
