@@ -27,7 +27,7 @@ namespace Example
             {
                 BackColor = Deserialize<Color>("color");
             }
-            catch (Exception e)
+            catch
             {
                 LogInfo("saved color not found");
             }
