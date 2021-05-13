@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
 using System.Diagnostics;
+using System.Drawing;
 
 namespace Lib
 {
@@ -19,6 +20,7 @@ namespace Lib
 
         private static readonly HashSet<Form> OpenForms = new HashSet<Form>();
         private static readonly Dictionary<Type, List<Tuple<string, MethodInfo, Func<Control, bool>>>> EventHandlers = new Dictionary<Type, List<Tuple<string, MethodInfo, Func<Control, bool>>>>();
+        private static readonly Dictionary<Graphics, bool> AuroraGraphics = new Dictionary<Graphics, bool>();
         private static Lib Instance { get; set; } = null;
 
         public List<Form> GetOpenForms()
@@ -54,10 +56,20 @@ namespace Lib
             }
         }
 
+        public static bool IsAuroraGraphics(Graphics graphics)
+        {
+            if (!AuroraGraphics.ContainsKey(graphics))
+            {
+                AuroraGraphics.Add(graphics, IsAuroraCode());
+            }
+
+            return AuroraGraphics[graphics];
+        }
+
         /// <summary>
         /// Helper method to determine whether the current stack frame includes Aurora's code.
         /// Useful to ensure your hooked events only affect Aurora and not AuroraPatch or other patches.
-        /// This function simply checks if the "StartAurora" method is in the callstack.
+        /// This function is slow, if possible use IsAuroraGraphics(Graphics graphics) instead which will cache results.
         /// </summary>
         /// <returns></returns>
         public static bool IsAuroraCode()
