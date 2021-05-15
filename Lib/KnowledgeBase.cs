@@ -258,6 +258,15 @@ namespace Lib
                 .Select(c => (Button)c);
         }
 
+        public IEnumerable<Button> GetTimeIncrementButtonsGalacticMap()
+        {
+            var galacticMap = Lib.GetOpenForms().FirstOrDefault(f => f.Name == "GalacticMap");
+            if (galacticMap == null) return Enumerable.Empty<Button>();
+            return UIManager.IterateControls(galacticMap)
+                .Where(c => c.GetType() == typeof(Button) && ((Button)c).Name.Contains("cmdIncrement"))
+                .Select(c => (Button)c);
+        }
+
         public IEnumerable<Button> GetSubPulseButtons()
         {
             if (Lib.TacticalMap == null) return new List<Button>();
