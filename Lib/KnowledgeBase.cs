@@ -250,37 +250,20 @@ namespace Lib
             return methods;
         }
 
-        public List<Button> GetTimeIncrementButtons()
+        public IEnumerable<Button> GetTimeIncrementButtons()
         {
-            var buttons = new List<Button>();
+            if (Lib.TacticalMap == null) return new List<Button>();
+            return UIManager.IterateControls(Lib.TacticalMap)
+                .Where(c => c.GetType() == typeof(Button) && ((Button)c).Name.Contains("cmdIncrement"))
+                .Select(c => (Button)c);
+        }
 
-            if (Lib.TacticalMap == null)
-            {
-                return buttons;
-            }
-
-            var stack = new Stack<Control>();
-            stack.Push(Lib.TacticalMap);
-
-            while (stack.Count > 0)
-            {
-                var control = stack.Pop();
-
-                if (control is Button button)
-                {
-                    if (button.Name.Contains("cmdIncrement"))
-                    {
-                        buttons.Add(button);
-                    }
-                }
-
-                foreach (Control c in control.Controls)
-                {
-                    stack.Push(c);
-                }
-            }
-
-            return buttons;
+        public IEnumerable<Button> GetSubPulseButtons()
+        {
+            if (Lib.TacticalMap == null) return new List<Button>();
+            return UIManager.IterateControls(Lib.TacticalMap)
+                .Where(c => c.GetType() == typeof(Button) && ((Button)c).Name.Contains("cmdSubPulse"))
+                .Select(c => (Button)c);
         }
 
         public string GetFormOpenButtonName(AuroraType type)
