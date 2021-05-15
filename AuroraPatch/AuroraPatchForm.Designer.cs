@@ -95,6 +95,7 @@ namespace AuroraPatch
             this.Controls.Add(this.ButtonStart);
             this.Name = "AuroraPatchForm";
             this.Text = "AuroraPatch";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.AuroraPatchForm_FormClosed);
             this.ResumeLayout(false);
             this.PerformLayout();
 

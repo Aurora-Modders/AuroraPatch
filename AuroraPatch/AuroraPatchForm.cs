@@ -39,6 +39,9 @@ namespace AuroraPatch
                 return;
             }
 
+            ButtonStart.Enabled = false;
+            Refresh();
+
             try
             {
                 Loader.StartAurora(Patches);
@@ -97,6 +100,14 @@ namespace AuroraPatch
         private void ListPatches_SelectedIndexChanged(object sender, EventArgs e)
         {
             UpdateDescription();
+        }
+
+        private void AuroraPatchForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            if (Loader.TacticalMap == null || Loader.TacticalMap.Visible == false)
+            {
+                Application.Exit();
+            }
         }
     }
 }
