@@ -39,6 +39,9 @@ namespace AuroraPatch
                 return;
             }
 
+            ButtonStart.Enabled = false;
+            Refresh();
+
             try
             {
                 Loader.StartAurora(Patches);
