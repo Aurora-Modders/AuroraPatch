@@ -11,6 +11,17 @@ namespace AuroraPatch
         private readonly Loader Loader;
         private readonly List<Patch> Patches;
 
+        private void HideNotClose(object sender, FormClosingEventArgs e)
+        {
+            // If Aurora hasn't been started yet (indicated by the "started" flag in Loader class), closing the window should kill the entire application, not only remove the window.
+            if (e.CloseReason == CloseReason.UserClosing && Loader.started)
+            {
+                e.Cancel = true;
+                ((Control)sender).Hide();
+            }
+            if (e.CloseReason == CloseReason.UserClosing && !Loader.started) Environment.Exit(0);
+        }
+
         internal AuroraPatchForm(Loader loader) : base()
         {
             InitializeComponent();

@@ -98,6 +98,11 @@ namespace AuroraPatch
             this.ResumeLayout(false);
             this.PerformLayout();
 
+            //
+            // Upon closing the window the application doesn't stop
+            //
+            this.FormClosing += HideNotClose;
+
         }
 
         #endregion

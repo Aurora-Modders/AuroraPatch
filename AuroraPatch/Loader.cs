@@ -6,9 +6,11 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Windows.Forms;
+using System.Threading;
 
 namespace AuroraPatch
 {
+
     internal class Loader
     {
         internal readonly string AuroraExecutablePath;
@@ -16,6 +18,7 @@ namespace AuroraPatch
         internal readonly List<Patch> LoadedPatches = new List<Patch>();
         internal volatile Assembly AuroraAssembly = null;
         internal volatile Form TacticalMap = null;
+        internal bool started = false;
 
         internal Loader(string exe, string checksum)
         {
@@ -170,6 +173,28 @@ namespace AuroraPatch
                 }
             }
             Program.Logger.LogInfo("Done running Started");
+
+            // At this point Aurora is definitely opened, so "started" flag needs to be set to properly to indicate that from now on close button shall not terminate the application, but only hide form.
+            // Start monitoring Aurora, if the game is closed the application will also terminate.
+            started = true;
+            Thread thread = new Thread(MonitorAuroraProcess);
+            thread.Start();
+        }
+
+
+        // Check if Aurora is opened - if not, close the application.
+        internal void MonitorAuroraProcess()
+        {
+            while (true)
+            {
+                // Close AuroraPatch if tactical map is not visible or null.
+                if (TacticalMap is null || !TacticalMap.Visible)
+                {
+                    Program.Logger.LogInfo("Aurora process not found, closing application");
+                    Environment.Exit(0);
+                }
+                Thread.Sleep(1000);
+            }
         }
 
         /// <summary>
