@@ -98,5 +98,13 @@ namespace AuroraPatch
         {
             UpdateDescription();
         }
+
+        private void AuroraPatchForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            if (Loader.TacticalMap == null || Loader.TacticalMap.Visible == false)
+            {
+                Application.Exit();
+            }
+        }
     }
 }

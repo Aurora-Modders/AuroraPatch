@@ -53,7 +53,10 @@ namespace AuroraPatch
                 return null;
             };
 
-            Application.Run(new AuroraPatchForm(loader));
+            var form = new AuroraPatchForm(loader);
+            form.Show();
+
+            Application.Run();
         }
 
         /// <summary>

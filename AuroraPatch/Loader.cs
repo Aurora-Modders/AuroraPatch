@@ -145,6 +145,11 @@ namespace AuroraPatch
             Program.Logger.LogInfo("Starting Aurora");
             TacticalMap = CreateTacticalMap(AuroraAssembly);
             TacticalMap.Shown += MapShown;
+            TacticalMap.FormClosed += (sender, e) =>
+            {
+                Application.Exit();
+            };
+
             TacticalMap.Show();
         }
 
