@@ -17,3 +17,7 @@ The Lib patch is a patch intended to provide services to other patches, a bit li
 ## For contributors
 
 AuroraPatch is the main patcher application, it takes over and runs the Aurora game itself. AuroraPatch is designed to be as robust as possible against Aurora updates, any code which may stop working when Aurora updates belongs in Lib and not in AuroraPatch.
+
+When working on a patch, there may be patch-specific instructions on how to build/contribute to the project.
+
+Otherwise, please see the [CONTRIBUTORS.md](/CONTRIBUTORS.md) file for help on how to get up and running.
