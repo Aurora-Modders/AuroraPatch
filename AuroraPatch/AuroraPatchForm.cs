@@ -14,12 +14,13 @@ namespace AuroraPatch
         private void HideNotClose(object sender, FormClosingEventArgs e)
         {
             // If Aurora hasn't been started yet (indicated by the "started" flag in Loader class), closing the window should kill the entire application, not only remove the window.
-            if (e.CloseReason == CloseReason.UserClosing && Loader.started)
+            if (e.CloseReason == CloseReason.UserClosing && Loader.Started)
             {
                 e.Cancel = true;
                 ((Control)sender).Hide();
+                Loader.AuroraPatchClosed = true;
             }
-            if (e.CloseReason == CloseReason.UserClosing && !Loader.started) Environment.Exit(0);
+            if (e.CloseReason == CloseReason.UserClosing && !Loader.Started) Environment.Exit(0);
         }
 
         internal AuroraPatchForm(Loader loader) : base()
