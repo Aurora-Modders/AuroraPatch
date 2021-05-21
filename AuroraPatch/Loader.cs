@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Windows.Forms;
+using System.Drawing;
 
 namespace AuroraPatch
 {
@@ -218,7 +219,11 @@ namespace AuroraPatch
 
                 Program.Logger.LogInfo($"TacticalMap found: {map.Name}");
 
-                return (Form)Activator.CreateInstance(map);
+                Form mapForm = (Form)Activator.CreateInstance(map);
+
+                mapForm.Icon = Icon.ExtractAssociatedIcon(AuroraExecutablePath);
+
+                return mapForm;
             }
             catch (Exception e)
             {
