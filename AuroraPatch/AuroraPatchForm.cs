@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Windows.Forms;
 
 namespace AuroraPatch
@@ -64,6 +65,7 @@ namespace AuroraPatch
             }
 
             UpdateDescription();
+            UpdateSettings();
         }
 
         private void UpdateDescription()
@@ -78,6 +80,23 @@ namespace AuroraPatch
             {
                 LabelDescription.Text = "Description:";
             }     
+        }
+
+        private void UpdateSettings()
+        {
+            var index = ListPatches.SelectedIndex;
+            if (index >= 0)
+            {
+                var patch = Patches.Single(p => p.Name == (string)ListPatches.Items[index]);
+                var flags = BindingFlags.Instance | BindingFlags.DeclaredOnly | BindingFlags.NonPublic;
+                bool hasSettings = patch.GetType().GetMethod("ChangeSettings", flags) != null;
+
+                ButtonChangeSettings.Enabled = hasSettings;
+            }
+            else
+            {
+                ButtonChangeSettings.Enabled = false;
+            }
         }
 
         private void ButtonChangeSettings_Click(object sender, EventArgs e)
@@ -100,6 +119,7 @@ namespace AuroraPatch
         private void ListPatches_SelectedIndexChanged(object sender, EventArgs e)
         {
             UpdateDescription();
+            UpdateSettings();
         }
 
         private void AuroraPatchForm_FormClosed(object sender, FormClosedEventArgs e)
