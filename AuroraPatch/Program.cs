@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Diagnostics;
+using System.Reflection;
 using System.Windows.Forms;
 using System.Security.Cryptography;
 
@@ -19,8 +20,8 @@ namespace AuroraPatch
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-
-            var exe = Path.Combine(Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName), "Aurora.exe");
+            
+            var exe = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Aurora.exe");
             if (args.Length > 0)
             {
                 Logger.LogInfo("User provided Aurora.exe path: " + args[0]);
