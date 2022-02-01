@@ -7,6 +7,8 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Windows.Forms;
 using System.Drawing;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace AuroraPatch
 {
@@ -231,6 +233,64 @@ namespace AuroraPatch
 
                 throw new Exception("Failed to create TacticalMap.");
             }
+        }
+        
+        internal void SaveSelectedPatches(List<Patch> selectedPatches)
+        {
+
+            try
+            {
+                var dir = Path.Combine(Path.GetDirectoryName(AuroraExecutablePath));
+                var file = Path.Combine(dir, "AuroraPatchSelected.json");
+
+                string[] strSelected = new string[selectedPatches.Count];
+
+                for (int i = 0; i < selectedPatches.Count; i++)
+                {
+                    strSelected[i] = selectedPatches[i].Name;
+                }
+            
+                var serializer = new JsonSerializer
+                {
+                    Formatting = Formatting.Indented
+                };
+            
+                using (var reader = new StreamWriter(file))
+                using (var json = new JsonTextWriter(reader))
+                {
+                    serializer.Serialize(json, strSelected);
+                }
+            }
+            catch (Exception e)
+            {
+                Program.Logger.LogCritical($"Failed to save patch selection. {e}");
+            }
+            
+        }
+        
+        internal string[] LoadSelectedPatches()
+        {
+            try
+            {
+                var dir = Path.Combine(Path.GetDirectoryName(AuroraExecutablePath));
+                var file = Path.Combine(dir, "AuroraPatchSelected.json");
+            
+                var serializer = new JsonSerializer
+                {
+                    Formatting = Formatting.Indented
+                };
+                serializer.Converters.Add(new StringEnumConverter());
+                using (var reader = new StreamReader(file))
+                using (var json = new JsonTextReader(reader))
+                {
+                    return serializer.Deserialize<string[]>(json);
+                }
+            }
+            catch (Exception e)
+            {
+                Program.Logger.LogCritical($"Failed to load patch selection. {e}");
+            }
+            return new string[0];
         }
     }
 }
