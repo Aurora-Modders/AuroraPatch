@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
@@ -8,9 +9,8 @@ namespace AuroraPatch
 {
     public partial class AuroraPatchForm : Form
     {
-        private readonly Loader      Loader;
+        private readonly Loader Loader;
         private readonly List<Patch> Patches;
-        private          bool        IgnoreCheck;
 
         internal AuroraPatchForm(Loader loader) : base()
         {
@@ -36,7 +36,7 @@ namespace AuroraPatch
             foreach (var missing in Loader.GetMissingDependencies(Patches))
             {
                 MessageBox.Show($"Patch {missing.Key.Name} missing dependency {missing.Value}");
-
+                
                 return;
             }
 
@@ -45,15 +45,7 @@ namespace AuroraPatch
 
             try
             {
-                List<Patch> selectedPatches = new List<Patch>();
-
-                if (CheckedListPatches.CheckedItems.Count != 0)
-                {
-                    selectedPatches.AddRange(from object checkedItem in CheckedListPatches.CheckedItems
-                                             select Patches.Find(patch => patch.Name == checkedItem.ToString()));
-                }
-
-                Loader.StartAurora(selectedPatches);
+                Loader.StartAurora(Patches);
             }
             catch (Exception ex)
             {
@@ -64,12 +56,12 @@ namespace AuroraPatch
 
         private void UpdateList()
         {
-            // Co-variant array conversion from string[] to object[] can cause run-time exception on write operation
-            CheckedListPatches.Items.AddRange(Patches.Select(patch => patch.Name).ToArray());
+            ListPatches.Items.Clear();
+            ListPatches.Items.AddRange(Patches.Select(p => p.Name).ToArray());
 
-            if (CheckedListPatches.Items.Count > 0)
+            if (ListPatches.Items.Count > 0)
             {
-                CheckedListPatches.SelectedIndex = 0;
+                ListPatches.SelectedIndex = 0;
             }
 
             UpdateDescription();
@@ -78,26 +70,26 @@ namespace AuroraPatch
 
         private void UpdateDescription()
         {
-            int index = CheckedListPatches.SelectedIndex;
+            var index = ListPatches.SelectedIndex;
             if (index >= 0)
             {
-                var patch = Patches.Single(p => p.Name == (string)CheckedListPatches.Items[index]);
+                var patch = Patches.Single(p => p.Name == (string)ListPatches.Items[index]);
                 LabelDescription.Text = $"Description: {patch.Description}";
             }
             else
             {
-                LabelDescription.Text = "No patch selected...";
-            }
+                LabelDescription.Text = "Description:";
+            }     
         }
 
         private void UpdateSettings()
         {
-            int index = CheckedListPatches.SelectedIndex;
+            var index = ListPatches.SelectedIndex;
             if (index >= 0)
             {
-                var                patch = Patches.Single(p => p.Name == (string)CheckedListPatches.Items[index]);
-                const BindingFlags flags = BindingFlags.Instance | BindingFlags.DeclaredOnly | BindingFlags.NonPublic;
-                bool               hasSettings = patch.GetType().GetMethod("ChangeSettings", flags) != null;
+                var patch = Patches.Single(p => p.Name == (string)ListPatches.Items[index]);
+                var flags = BindingFlags.Instance | BindingFlags.DeclaredOnly | BindingFlags.NonPublic;
+                bool hasSettings = patch.GetType().GetMethod("ChangeSettings", flags) != null;
 
                 ButtonChangeSettings.Enabled = hasSettings;
             }
@@ -109,18 +101,25 @@ namespace AuroraPatch
 
         private void ButtonChangeSettings_Click(object sender, EventArgs e)
         {
-            int index = CheckedListPatches.SelectedIndex;
-            if (index < 0) return;
+            var index = ListPatches.SelectedIndex;
+            if (index >= 0)
+            {
+                var patch = Patches.Single(p => p.Name == (string)ListPatches.Items[index]);
+                try
+                {
+                    patch.ChangeSettingsInternal();
+                }
+                catch (Exception ex)
+                {
+                    Program.Logger.LogError($"Failed to change settings for Patch {patch.Name}. {ex}");
+                }
+            }
+        }
 
-            var patch = Patches.Single(p => p.Name == (string)CheckedListPatches.Items[index]);
-            try
-            {
-                patch.ChangeSettingsInternal();
-            }
-            catch (Exception ex)
-            {
-                Program.Logger.LogError($"Failed to change settings for Patch {patch.Name}. {ex}");
-            }
+        private void ListPatches_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            UpdateDescription();
+            UpdateSettings();
         }
 
         private void AuroraPatchForm_FormClosed(object sender, FormClosedEventArgs e)
@@ -129,27 +128,6 @@ namespace AuroraPatch
             {
                 Application.Exit();
             }
-        }
-
-        private void CheckedListPatches_ItemCheck(object sender, ItemCheckEventArgs e)
-        {
-            if (IgnoreCheck) e.NewValue = e.CurrentValue;
-        }
-
-        private void CheckedListPatches_MouseClick(object sender, MouseEventArgs e)
-        {
-            IgnoreCheck = e.X > SystemInformation.MenuCheckSize.Width;
-        }
-
-        private void CheckedListPatches_MouseUp(object sender, MouseEventArgs e)
-        {
-            IgnoreCheck = false;
-        }
-
-        private void CheckedListPatches_SelectedValueChanged(object sender, EventArgs e)
-        {
-            UpdateDescription();
-            UpdateSettings();
         }
     }
 }
