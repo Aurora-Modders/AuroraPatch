@@ -29,16 +29,6 @@ namespace AuroraPatch
             }
 
             UpdateList();
-            var selected = loader.LoadSelectedPatches();
-            for (int i = 0; i < CheckedListPatches.Items.Count; i++)
-            {
-
-                var thing = CheckedListPatches.Items[i];
-                var strname = thing.ToString();
-                if(selected.Contains(strname))
-                    CheckedListPatches.SetItemChecked(i, true);
-                
-            }
         }
 
         private void ButtonStart_Click(object sender, EventArgs e)
@@ -64,7 +54,6 @@ namespace AuroraPatch
                 }
 
                 Loader.StartAurora(selectedPatches);
-                Loader.SaveSelectedPatches(selectedPatches);
             }
             catch (Exception ex)
             {
