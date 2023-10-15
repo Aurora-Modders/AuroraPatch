@@ -12,11 +12,11 @@ namespace AuroraPatch
         private readonly Loader Loader;
         private readonly List<Patch> Patches;
 
-        internal AuroraPatchForm(Loader loader) : base()
+        internal AuroraPatchForm() : base()
         {
             InitializeComponent();
 
-            Loader = loader;
+            Loader = Program.Loader;
             try
             {
                 Patches = Loader.FindPatches();
@@ -49,8 +49,7 @@ namespace AuroraPatch
             }
             catch (Exception ex)
             {
-                Program.Logger.LogCritical($"Failed to start Aurora. {ex}");
-                MessageBox.Show("Failed to start Aurora.");
+                Program.Logger.LogCritical($"Failed to start Aurora. {ex}", true);
             }
         }
 

@@ -10,6 +10,7 @@ namespace AuroraPatch
     internal static class Program
     {
         internal static readonly Logger Logger = new Logger();
+        internal static Loader Loader { get; private set; }
 
         /// <summary>
         /// The main entry point for the application.
@@ -39,7 +40,7 @@ namespace AuroraPatch
             Logger.LogInfo($"Found Aurora at {exe}");
 
             var checksum = GetChecksum(File.ReadAllBytes(exe));
-            var loader = new Loader(exe, checksum);
+            Loader = new Loader(exe, checksum);
 
             AppDomain.CurrentDomain.AssemblyResolve += (sender, a) =>
             {
@@ -54,7 +55,7 @@ namespace AuroraPatch
                 return null;
             };
 
-            var form = new AuroraPatchForm(loader);
+            var form = new AuroraPatchForm();
             form.Show();
 
             Application.Run();

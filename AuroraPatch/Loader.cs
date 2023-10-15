@@ -26,7 +26,6 @@ namespace AuroraPatch
 
         internal List<Patch> FindPatches()
         {
-            var patches = new List<Patch>();
             string patchesDirectory = Path.Combine(Path.GetDirectoryName(AuroraExecutablePath), "Patches");
             Directory.CreateDirectory(patchesDirectory);
 
@@ -53,6 +52,9 @@ namespace AuroraPatch
                 }
             }
 
+            var patches = new List<Patch>();
+            var names = new HashSet<string>();
+
             foreach (var assembly in assemblies)
             {
                 Program.Logger.LogInfo($"Trying to retrieve types from assembly {Path.GetFileName(assembly.Location)}");
@@ -61,12 +63,18 @@ namespace AuroraPatch
                 {
                     foreach (var type in assembly.GetTypes())
                     {
+                        if (names.Contains(type.Name))
+                        {
+                            continue;
+                        }
+
                         if (typeof(Patch).IsAssignableFrom(type))
                         {
                             Program.Logger.LogInfo($"Found patch {type.Name}");
                             var patch = (Patch)Activator.CreateInstance(type);
                             patch.Loader = this;
                             patches.Add(patch);
+                            names.Add(type.Name);
                         }
                     }
                 }

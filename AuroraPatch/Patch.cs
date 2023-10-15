@@ -30,19 +30,34 @@ namespace AuroraPatch
         internal Loader Loader { get; set; }
 
         /// <summary>
-        /// Get one of your dependencies.
+        /// Get one of your dependencies. Deprecated, use TryGetPatch instead.
         /// </summary>
-        public T GetDependency<T>(string name) where T : Patch
+        public T GetDependency<T>(string name = null) where T : Patch
         {
-            try
+            if (TryGetPatch<T>(out var patch))
             {
-                return (T)Loader.LoadedPatches.Single(p => p.Name == name);
+                return patch;
             }
-            catch (Exception e)
+            else
             {
-                LogError($"Failed to get dependency {name}. {e}");
+                return default;
+            }
+        }
 
-                return null;
+        /// <summary>
+        /// Get another loaded patch.
+        /// </summary>
+        public bool TryGetPatch<T>(out T patch) where T : Patch
+        {
+            patch = (T)Loader.LoadedPatches.SingleOrDefault(x => x.Name == typeof(T).Name);
+
+            if (patch != default)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 
