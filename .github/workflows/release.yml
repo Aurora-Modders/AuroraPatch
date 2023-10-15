@@ -3,16 +3,6 @@ name: Release
 on:
 
   workflow_dispatch:
-  
-    branches:
-    
-    - master
-
-  push:
-  
-    branches:
-    
-    - master
         
 jobs:
 
@@ -43,20 +33,6 @@ jobs:
       
     - name: Include Lib in AuroraPatch
       run: xcopy Lib\bin\Release AuroraPatch\bin\Release\Patches\Lib\ /E
-      
-    - name: Delete previous dev release
-      if: ${{ github.event_name != 'workflow_dispatch' }}
-      uses: dev-drprasad/delete-tag-and-release@v0.2.0
-      with:
-        delete_release: true # default: false
-        tag_name: vdev-latest # tag name to delete
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      
-    - name: Set dev release
-      if: ${{ github.event_name != 'workflow_dispatch' }}
-      id: release_type
-      run: echo "::set-output name=version::dev-latest"
       
     - name: Bump release version
       id: tag_version
