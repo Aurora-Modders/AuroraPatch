@@ -31,7 +31,7 @@ namespace AuroraPatch
             
             if (!File.Exists(exe))
             {
-                Logger.LogCritical($"File {exe} is missing or is not readable.");
+                Logger.LogCritical($"File {exe} is missing or is not readable.", true);
                 Application.Exit();
 
                 return;

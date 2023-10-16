@@ -17,6 +17,7 @@ namespace AuroraPatch
         public string AuroraChecksum => Loader.AuroraChecksum; // available on Loaded
         public Assembly AuroraAssembly => Loader.AuroraAssembly; // available on Loaded
         public Form TacticalMap => Loader.TacticalMap; // available on Started
+        public string Folder => Path.Combine(Path.GetDirectoryName(AuroraExecutablePath), "Patches", Name);
 
         /// <summary>
         /// A description for your mod, shown on the AuroraPatch UI.
@@ -60,6 +61,11 @@ namespace AuroraPatch
                 return false;
             }
         }
+
+        /// <summary>
+        /// Iterate all loaded patches.
+        /// </summary>
+        public IEnumerable<Patch> GetLoadedPatches() => Loader.LoadedPatches;
 
         /// <summary>
         /// Run code on Aurora's UI thread. Only available on Started..
