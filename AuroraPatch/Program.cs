@@ -84,6 +84,7 @@ namespace AuroraPatch
         {
             var form = new AuroraPatchForm();
             form.DoStart();
+            Application.Run();
         }
 
         /// <summary>
