@@ -62,28 +62,13 @@ namespace AuroraPatch
                 return null;
             };
 
+            var form = new AuroraPatchForm();
+            form.Show();
             if (launch)
             {
                 // Automatically start Aurora with patches
-                AutoStartAurora();
+                form.DoStart();
             }
-            else
-            {
-                // Show the configuration GUI
-                var form = new AuroraPatchForm();
-                form.Show();
-                Application.Run();
-            }
-        }
-
-        /// <summary>
-        /// Automatically loads patches and starts Aurora without showing the GUI.
-        /// Replicates the functionality of ButtonStart_Click from AuroraPatchForm.
-        /// </summary>
-        private static void AutoStartAurora()
-        {
-            var form = new AuroraPatchForm();
-            form.DoStart();
             Application.Run();
         }
 
