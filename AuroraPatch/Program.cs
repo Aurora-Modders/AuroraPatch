@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Windows.Forms;
 using System.Security.Cryptography;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace AuroraPatch
 {
@@ -22,11 +24,16 @@ namespace AuroraPatch
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             
+            bool launch = args.Contains("-launch");
+            
             var exe = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Aurora.exe");
-            if (args.Length > 0)
+
+            // Handle Aurora.exe path argument (skip -launch when looking for exe path)
+            var nonConfigArgs = args.Where(arg => arg != "-launch").ToArray();
+            if (nonConfigArgs.Length > 0)
             {
-                Logger.LogInfo("User provided Aurora.exe path: " + args[0]);
-                exe = args[0];
+                Logger.LogInfo("User provided Aurora.exe path: " + nonConfigArgs[0]);
+                exe = nonConfigArgs[0];
             }
             
             if (!File.Exists(exe))
@@ -55,10 +62,28 @@ namespace AuroraPatch
                 return null;
             };
 
-            var form = new AuroraPatchForm();
-            form.Show();
+            if (launch)
+            {
+                // Automatically start Aurora with patches
+                AutoStartAurora();
+            }
+            else
+            {
+                // Show the configuration GUI
+                var form = new AuroraPatchForm();
+                form.Show();
+                Application.Run();
+            }
+        }
 
-            Application.Run();
+        /// <summary>
+        /// Automatically loads patches and starts Aurora without showing the GUI.
+        /// Replicates the functionality of ButtonStart_Click from AuroraPatchForm.
+        /// </summary>
+        private static void AutoStartAurora()
+        {
+            var form = new AuroraPatchForm();
+            form.DoStart();
         }
 
         /// <summary>
