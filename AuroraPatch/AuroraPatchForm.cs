@@ -33,6 +33,11 @@ namespace AuroraPatch
 
         private void ButtonStart_Click(object sender, EventArgs e)
         {
+            DoStart();
+        }
+
+        public void DoStart()
+        { 
             foreach (var missing in Loader.GetMissingDependencies(Patches))
             {
                 MessageBox.Show($"Patch {missing.Key.Name} missing dependency {missing.Value}");
