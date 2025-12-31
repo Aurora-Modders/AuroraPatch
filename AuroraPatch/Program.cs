@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using System.Security.Cryptography;
 using System.Collections.Generic;
 using System.Linq;
+using System.Globalization;
 
 namespace AuroraPatch
 {
@@ -27,6 +28,10 @@ namespace AuroraPatch
             bool launch = args.Contains("-launch");
             
             var exe = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Aurora.exe");
+
+            var culture = CultureInfo.CreateSpecificCulture("en-GB");
+            CultureInfo.DefaultThreadCurrentCulture = culture;
+            CultureInfo.DefaultThreadCurrentUICulture = culture;
 
             // Handle Aurora.exe path argument (skip -launch when looking for exe path)
             var nonConfigArgs = args.Where(arg => arg != "-launch").ToArray();
