@@ -41,6 +41,54 @@ namespace Lib
         internal KnowledgeBase(Lib lib)
         {
             Lib = lib;
+            ApplyVersionButtonNames();
+        }
+
+        /// <summary>
+        /// Checksum of Aurora 3.3.0.
+        /// </summary>
+        public const string Aurora330Checksum = "FQ4CUl";
+
+        /// <summary>
+        /// Tactical map buttons renamed in Aurora 3.3.0.
+        /// </summary>
+        private static readonly Dictionary<AuroraButton, string> Aurora330ButtonRenames = new Dictionary<AuroraButton, string>
+        {
+            { AuroraButton.SubPulse, "cmdIncrementSubPulse" },
+            { AuroraButton.SubPulse5S, "cmdIncrementSubPulse5S" },
+            { AuroraButton.SubPulse30S, "cmdIncrementSubPulse30S" },
+            { AuroraButton.SubPulse2M, "cmdIncrementSubPulse2M" },
+            { AuroraButton.SubPulse5M, "cmdIncrementSubPulse5M" },
+            { AuroraButton.SubPulse20M, "cmdIncrementSubPulse20M" },
+            { AuroraButton.SubPulse1H, "cmdIncrementSubPulse1H" },
+            { AuroraButton.SubPulse3H, "cmdIncrementSubPulse3H" },
+            { AuroraButton.SubPulse8H, "cmdIncrementSubPulse8H" },
+            { AuroraButton.SubPulse1D, "cmdIncrementSubPulse1D" },
+            { AuroraButton.SubPulse5D, "cmdIncrementSubPulse5D" },
+            { AuroraButton.SubPulse30D, "cmdIncrementSubPulse30D" },
+            { AuroraButton.ZoomIn, "cmdToolbarZoomIn" },
+            { AuroraButton.ZoomOut, "cmdToolbarZoomOut" },
+            { AuroraButton.Up, "cmdToolbarUp" },
+            { AuroraButton.Down, "cmdToolbarDown" },
+            { AuroraButton.Left, "cmdToolbarLeft" },
+            { AuroraButton.Right, "cmdToolbarRight" },
+            { AuroraButton.SM, "cmdToolbarSM" },
+        };
+
+        private void ApplyVersionButtonNames()
+        {
+            if (Lib.AuroraChecksum != Aurora330Checksum)
+            {
+                return;
+            }
+
+            foreach (var rename in Aurora330ButtonRenames)
+            {
+                AuroraButtons[rename.Key] = rename.Value;
+            }
+
+            // Removed from the galactic map in 3.3.
+            AuroraButtons.Remove(AuroraButton.ToolbarHabitable);
         }
 
         /// <summary>
@@ -157,7 +205,31 @@ namespace Lib
 
         public IEnumerable<KeyValuePair<AuroraType, string>> GetKnownTypeNames()
         {
-            if (Lib.AuroraChecksum == "chm1c7")
+            if (Lib.AuroraChecksum == Aurora330Checksum)
+            {
+                yield return new KeyValuePair<AuroraType, string>(AuroraType.TacticalMapForm, "l0");
+                yield return new KeyValuePair<AuroraType, string>(AuroraType.EconomicsForm, "hu");
+                yield return new KeyValuePair<AuroraType, string>(AuroraType.GameState, "a3");
+                yield return new KeyValuePair<AuroraType, string>(AuroraType.ClassDesignForm, "bj");
+                yield return new KeyValuePair<AuroraType, string>(AuroraType.CreateProjectForm, "ba");
+                yield return new KeyValuePair<AuroraType, string>(AuroraType.FleetWindowForm, "gk");
+                yield return new KeyValuePair<AuroraType, string>(AuroraType.MissileDesignForm, "hx");
+                yield return new KeyValuePair<AuroraType, string>(AuroraType.TurretDesignForm, "ma");
+                yield return new KeyValuePair<AuroraType, string>(AuroraType.GroundUnitDesignForm, "g9");
+                yield return new KeyValuePair<AuroraType, string>(AuroraType.CommandersWindowForm, "a6");
+                yield return new KeyValuePair<AuroraType, string>(AuroraType.MedalsForm, "bc");
+                yield return new KeyValuePair<AuroraType, string>(AuroraType.RaceWindowForm, "jn");
+                yield return new KeyValuePair<AuroraType, string>(AuroraType.SystemViewForm, "lz");
+                yield return new KeyValuePair<AuroraType, string>(AuroraType.GalacticMapForm, "bg");
+                yield return new KeyValuePair<AuroraType, string>(AuroraType.RaceComparisonForm, "jl");
+                yield return new KeyValuePair<AuroraType, string>(AuroraType.DiplomacyForm, "a7");
+                yield return new KeyValuePair<AuroraType, string>(AuroraType.TechnologyViewForm, "l9");
+                yield return new KeyValuePair<AuroraType, string>(AuroraType.MineralsForm, "hw");
+                yield return new KeyValuePair<AuroraType, string>(AuroraType.SectorsForm, "be");
+                yield return new KeyValuePair<AuroraType, string>(AuroraType.EventsForm, "fz");
+                yield return new KeyValuePair<AuroraType, string>(AuroraType.GameDetailsForm, "k7");
+            }
+            else if (Lib.AuroraChecksum == "chm1c7")
             {
                 yield return new KeyValuePair<AuroraType, string>(AuroraType.TacticalMapForm, "jt");
                 yield return new KeyValuePair<AuroraType, string>(AuroraType.EconomicsForm, "gz");
@@ -254,7 +326,7 @@ namespace Lib
         {
             if (Lib.TacticalMap == null) return new List<Button>();
             return UIManager.IterateControls(Lib.TacticalMap)
-                .Where(c => c.GetType() == typeof(Button) && ((Button)c).Name.Contains("cmdIncrement"))
+                .Where(c => c.GetType() == typeof(Button) && ((Button)c).Name.Contains("cmdIncrement") && !((Button)c).Name.Contains("SubPulse"))
                 .Select(c => (Button)c);
         }
 
@@ -263,7 +335,7 @@ namespace Lib
             var galacticMap = Lib.GetOpenForms().FirstOrDefault(f => f.Name == "GalacticMap");
             if (galacticMap == null) return Enumerable.Empty<Button>();
             return UIManager.IterateControls(galacticMap)
-                .Where(c => c.GetType() == typeof(Button) && ((Button)c).Name.Contains("cmdIncrement"))
+                .Where(c => c.GetType() == typeof(Button) && ((Button)c).Name.Contains("cmdIncrement") && !((Button)c).Name.Contains("SubPulse"))
                 .Select(c => (Button)c);
         }
 
@@ -271,7 +343,7 @@ namespace Lib
         {
             if (Lib.TacticalMap == null) return new List<Button>();
             return UIManager.IterateControls(Lib.TacticalMap)
-                .Where(c => c.GetType() == typeof(Button) && ((Button)c).Name.Contains("cmdSubPulse"))
+                .Where(c => c.GetType() == typeof(Button) && ((Button)c).Name.Contains("SubPulse"))
                 .Select(c => (Button)c);
         }
 
