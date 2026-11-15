@@ -200,7 +200,8 @@ namespace AuroraPatch
             {
                 var map = assembly.GetTypes().Single(type =>
                 {
-                    if (type.BaseType.Equals(typeof(Form)))
+                    // Interfaces (present from Aurora 3.3) have no BaseType.
+                    if (type.BaseType != null && type.BaseType.Equals(typeof(Form)))
                     {
                         var buttons = 0;
                         var checkboxes = 0;
